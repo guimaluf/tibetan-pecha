@@ -13,16 +13,26 @@
 These packages can be found in `texlive-lang-others` and `texlive-latex-extra`
 on Ubuntu, which can be installed as the following:
 
-    sudo apt-get install texlive-lang-others texlive-latex-extra
+`sudo apt-get install texlive-lang-others texlive-latex-extra`
 
 Compiling is done using XeLaTeX, which can be obtained with:
 
-    sudo apt-get install texlive-xetex
+`sudo apt-get install texlive-xetex `
 
 Example of usage:
 
-    $ xelatex prajnaparamita.tex
+Using xelatex
 
+`xelatex prajnaparamita.tex`
+
+Using latexmk
+
+`latexmk -pdf -pv -xelatex tsigdun-soldeb-naldjor.tex`
+
+
+Merging `a4pecha2` into one single printable pdf using `pdfjam`
+
+`pdfjam tsigdun-soldeb-naldjor/tsigdun-soldeb-naldjor.pdf --nup 1x2 --landscape --outfile tsigdun-soldeb-naldjor-merged.pdf`
 
 ## License
 
