@@ -1,10 +1,21 @@
-\documentclass[a4pecha2,simple,12pt,rotate]{pecha}
+\documentclass[a4pecha2,simple,12pt]{pecha}
 
 \usepackage{fontspec}
 \usepackage[utf8]{inputenc}
+% Fix covington bug
+\newcounter{subsection}
+\setcounter{subsection}{0}%
+%
+\usepackage{covington}
 
 \DeclareTextCommandDefault{\nobreakspace}{\leavevmode\nobreak\ }
 \XeTeXlinebreaklocale "bo"
 
-\setmainfont{Tibetan Machine Uni}
-%\setmainfont{Jomolhari}
+\setmainfont{Jomolhari}
+
+\renewcommand*\glosslineone{\Large}
+\renewcommand*\glosslinetwo{\scriptsize}
+\renewcommand*\glosslinethree{\normalfont}%
+
+% Define tseg as a space
+\catcode`\་=10
