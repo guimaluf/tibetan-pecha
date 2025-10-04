@@ -1,0 +1,525 @@
+\documentclass[a4paper,11pt]{article}
+%\usepackage[latin1]{mls}
+\usepackage{ctib}
+%\usepackage
+
+\newcommand\exa{\nopagebreak \begin{flushleft}\smallskip \nopagebreak
+                \begin{minipage}[t]{6cm}\sloppy}
+\newcommand\exb{\end{minipage}\kern 1cm\begin{minipage}[t]{8cm}\sloppy }
+\newcommand\exc{\end{minipage}\kern -3cm \smallskip\end{flushleft}}
+
+\title{\TibTeX\ \CtibVersionRelease:\\Tibetan for \TeX\ and \LaTeXe}
+\author{Oliver Corff\thanks{This work was partially funded by
+	DFG (Deutsche Forschungsgemeinschaft) in context with
+	the Mongolian Lexicography Project.}\\
+	\texttt{corff@zedat.fu-berlin.de}}
+
+\date{July 1st, 2001}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+	\TibTeX\ is a package offering Tibetan support for \TeX\ and
+	\LaTeXe.  This package is based on earlier works by Schwartz,
+	Sparkes, Sirlin, Steiner and Preining
+	(and would not be possible without their contributions!) but in
+	contrast to those the complete retransliteration process is
+	built on the ligature functionality of \TeX\ and Metafont, thus
+	effectively eliminating the need for installing any external
+	preprocessor or $\Omega$mega.
+\end{abstract}
+\tableofcontents
+
+\section{Introduction}
+
+Support for Tibetan has been available for the \TeX\ and \LaTeX\
+user community for quite a few years thanks to the contributions of 
+Ronald Schwartz, Jeff Sparkes, Dominik Wujastyk\footnote{URL:
+	\texttt{CTAN://tex-archive/language/tibetan/original/}},
+Sam Sirlin\footnote{URL: 
+	\texttt{CTAN://tex-archive/language/tibetan/sirlin/}}
+and
+Beat Steiner\footnote{URL:
+	\texttt{CTAN://tex-archive/language/tibetan/steiner/}}.
+
+\begin{sloppypar}
+After studying these sources it became evident to me that these systems
+were composed mainly with a \TeX\ and \LaTeX\ user in mind who is willing
+to set up additional external software (the Latin--Tibetan
+converter/preprocessor) and who, in addition, is willing to cope with
+ decidedly ``non-\TeX-ish'' code constructs (like \verb-%%-) for marking
+Tibetan language portions. I considered it useful if external preprocessors and 
+unidiomatic code could be avoided at reasonable cost for the user,
+i.\,e. without introducing loads of \verb-\ThisIsMySpecialTibetanLetter--like
+commands. In addition, I appreciated the idea of a Tibetan support that
+seamlessly fits into the \TeX\ and \LaTeXe\ world---after the typical
+\verb*-\input ...- or \verb-\usepackage{...}- declaration, the user should
+ideally write something like \verb-{\tib .bod skad.}- in order to obtain
+\hbox{\tib .bod skad.} which implies that the retransliteration engine
+is realized somewhere in the realms of \TeX\ and \LaTeX. 
+\end{sloppypar}
+
+The astute observer may inject that Norbert Preining made Tibetan support
+without preprocessor available in 1997 for the $\Omega$mega system.\footnote{%
+	The $\Omega$mega home is: 
+	\texttt{http://www.ens.fr/omega}. $\Omega$mega is also shipped
+	with recent versions of Thomas Esser's teTeX (URL:
+	\texttt{http://tug.org/teTeX/}), to name just one example.
+	
+	Norbert Preining's adaption of Sirlin's fonts for $\Omega$mega
+	can be found at:
+	\texttt{http://www.logic.at/people/preining/tex/tex.html}.}
+%
+% <- no new paragraph here!
+%
+As long as
+the transition to Unicode and $\Omega$mega has not been completed on a
+broad basis, I consider that there is still sufficient need for a \LaTeXe-%
+based Tibetan package. If its features were also usable in plain \TeX,
+I decided not to frown.
+
+
+\subsection{Words of Thanks}
+
+Of course, there is D.\,E.\,Knuth who created \TeX\ in the first place,
+and whose article on ``The New Versions of \TeX\ and \textsf{METAFONT}''%
+\footnote{Originally published in TUGboat 10 (1989), 325--328; 11 (1990),
+	12; studied in Knuth: \textit{Digital Typography}, 1999,
+	CSLI Publications, Stanford, California, p. 563--570.}
+ignited the initial spark for building a transliteration engine as a
+pure, if not huge ligature table.
+Ongoing discussions about Tibetan transliteration issues with Wolfgang Lipp
+in the context of the Pentaglot Project were also very helpful.
+My special thanks go to Mr.~Florian Reissinger for his patience while
+reviewing the glyph lists and his comments after proof-reading the
+test runs. The warmhearted patience and understanding support by
+\hbox{\tib .phun tshogs bde skyid.} and \hbox{\tib .byin ba.} was
+essential for finishing this project.
+
+
+\subsection{Some Technical Notes}
+
+Readers who are not interested in the internals of \TibTeX\
+can safely proceed to sections~\ref{Installation} and 
+\ref{UserCommands} of this text. The following notes are intended
+for those who want to get an understanding of the workings behind 
+the scenes.
+
+In \TibTeX, the Tibetan retransliteration system is based on the
+ligature mechanism located at the junction of Metafont and \TeX.
+In order to implement the
+ligature mechanism Sirlin's Metafont sources were rearranged completely.
+A separate coding mechanism with symbolic character codes was introduced
+so that all character interaction (numbering, ligtable programs etc.) could
+be defined on a purely mnemonic basis, thus avoiding the cumbersome
+inflexibility of a fixed numbering scheme. During this work a mistaken
+glyph was discovered which appeared \emph{twice}: a second \emph{cwa}
+({\tib cwa}) showed up in the slot of \emph{gwa} ({\tib gwa}) while
+the \emph{gwa} glyph was missing altogether. A new \emph{gwa} was
+then built using outline fragments of other glyphs.\footnote{%
+	Alas! The mistaken \emph{cwa} which wanted to be taken for
+	a \emph{gwa} even infiltrated $\Omega$mega Tibetan\dots}
+Some character definitions were then taken from Norbert Preining's
+work; I added a text symbol \textit{visarga} ({\tib :}) into the font.
+
+In a further step, the vowel bounding boxes for [\emph{e i o}] were raised 
+while several duplicate [\emph{u}]s with gradually sinking bounding
+boxes were added. Vowels could then be combined with consonants
+by simple ligature and kerning instructions, effectively eliminating
+the need for any \verb-\accent--construction on the document side.
+The exact alignment of carrier consonant and vowel can now be fine-tuned
+in the ligature table (\verb-ctibligs.mf- in the \texttt{mfinput}
+directory). While most of the conventional Tibetan words can be written
+easily in \TibTeX, the system, unlike Steiner's preprocessor,
+will fail with Sanskrit input as \emph{buddha} which turns out as
+*{\tib buddha} instead of {\tib bu\V{d}{dh},}. In cases like this
+users are requested to consult the vertical stacking command \verb|\V{}{}|
+which allows explicite stacking of any desired letter combination.
+
+Finally, a style file was created (\texttt{ctib.sty}) which provides
+the user interface to the Tibetan script and related commands. The
+style file calls font definition files which were created for accommodating
+future extensions like new script styles and typefaces.
+
+In early summer 2001, contact with Sam Sirlin was renewed, who had
+released the version 6.0 of his Tibetan package in the meantime.
+A major feature was the greatly enriched collection of glyphs
+(additional ligatures, letter elements for combining new and
+rare letters, diacritical marks, etc.) which was then made
+available to \TibTeX.
+
+\section{Installation\label{Installation}}
+
+Installation of this software package is straightforward:
+The installation procedure depends on the nature of the actual
+\TeX\ system. The directory tree of e.\,g., teTeX is different
+from the emtex tree; hence the source archive
+\texttt{ctib4tex}\textit{nn}\texttt{.zip}
+features the following subdirectories the contents of which has to be
+placed into appropriate branches of the \TeX\ installation:
+\begin{itemize}
+	\item \texttt{mfinput} holds the complete Metafont sources 
+		for the Tibetan fonts. The suggested path for emtex
+		users is \verb"\emtex\mfinput\ctib"; for teTeX users
+		\verb"$TEXMF/fonts/source/public/ctib" is a suitable
+		choice.
+	\item \texttt{tfm} holds all necessary font metrics files.
+	The suggested path for emtex users is \verb"\emtex\tfm\ctib";
+	for teTeX users \verb"$TEXMF/fonts/tfm/public/ctib"
+	is a suitable choice.
+	\item \texttt{texinput} holds all style files, font encoding
+		definitions etc. which are read by \TeX\ and \LaTeXe.
+		The suggested path for emtex users is
+		\verb"\emtex\texinput\ctib"; for teTeX users
+		\verb"$TEXMF/tex/latex/ctib" is a suitable choice.
+	\item \texttt{doc} contains the documentation (the document
+		which you are reading right now). It can be placed
+		in \verb"\emtex\doc\ctib" (for emtex users) or 
+		\verb"$TEXMF/doc/latex/ctib" (for teTeX users).
+\end{itemize}
+
+It may become necessary to rehash the directory database of the
+\TeX\ system. When in doubt, consult your system administrator or
+local \TeX\ wizard.
+On teTeX systems, the command \texttt{texhash} will perform this service.
+
+
+\section{User Commands\label{UserCommands}}
+
+\LaTeXe\ users activate Tibetan support for their documents via a
+\verb-\usepackage- declaration
+\begin{verbatim}
+	\documentclass[a4paper,11pt]{article}
+	\usepackage{ctib}
+\end{verbatim} in the preamble of the document, while
+\TeX\ users activate Tibetan support for their documents via an
+\verb*-\input - declaration
+\begin{verbatim}
+	\input ctib
+\end{verbatim} in the beginning of the document.  The only command
+necessary is \verb-\tib- which switches to Tibetan:
+
+\exa
+	This is Tibetan:\\
+	{\tib \swasti. .bod skad.}
+\exb
+	\begin{verbatim}
+	This is Tibetan:\\
+	{\tib \swasti. .bod skad.}
+	\end{verbatim}
+\exc
+
+The \textit{tsheg} is generated automatically after every syllable
+and can be inhibited by the command \verb|\notsheg|.
+\marginpar{%
+	The most important diacritics:
+
+	\textit{tsheg} inhibition via \texttt{\char92 notsheg}.
+
+	\texttt{.} $\rightarrow$ {\tib .}\\[1.2ex]
+	\texttt{,} $\rightarrow$ {\tib ,}\\[1.2ex]
+	\texttt{:} $\rightarrow$ {\tib :}\\[1.2ex]
+	\texttt{!} $\rightarrow$ {\tib !}\\[1.2ex]
+
+	\raggedright
+	\texttt{@} $\rightarrow$ {\tib @}\\
+
+}
+So, \verb|\tib go| creates {\tib go} whereas \verb|\tib go\notsheg|
+creates {\tib go\notsheg}. The intersentence space after sentences
+ending in \textit{k, g} is created by \verb|\K| which removes the
+\textit{tsheg} at the same time. Additional \textit{tsheg}s are
+produced by commata \verb|,| while the full stop \verb|.| generates
+the \textit{shad}, the exclamation mark \verb-!- generates a
+\textit{tsheg shad} and the colon \verb|:| produces a
+\textit{visarga}. \verb|\swasti| can also be abbreviated as
+\verb|@|. See also table~\ref{SpecialDiacritics} for a fairly complete
+overview of available special symbols.
+
+Stacks of consonants used for expressing Sanskrit words are not necessarily
+contained in the basic glyph collection of \TibTeX. They can, however,
+be generated easily with the \verb|\V{}{}|command (\texttt{V} like
+\textit{vertical}). An abbreviation exists also for \emph{om} which is
+\verb|\om|.
+
+\exa
+	{\tib \om, ma nxi pa\V{de}{ma}
+	\hung \hrih:}
+
+	Abbreviations exist:
+	{\tib \dme\ \ai.}
+\exb
+	\begin{verbatim}
+	{\tib \om, ma nxi pa\V{de}{ma}
+	\hung \hrih:}
+
+	Abbreviations exist:
+	{\tib \dme\ \ai.}
+	\end{verbatim}
+\exc
+
+
+\subsection{Transliteration Table}
+
+Unlike with Steiner's and Preining's systems, there is only one
+transliteration model available; at present the user has to accept
+what the system offers. Please consult the following tables for
+an overview of available symbols. Note: symbols which could be added
+with this version thanks to Sam Sirlin's recent work on Tibetan
+fonts were \fbox{framed} for easy identification.
+
+\newcommand{\TF}[1]{\begin{tabular}[t]{c}{\fbox{\tib\vphantom{\hrih}%
+			#1}}\\\textit{#1a}\end{tabular}}
+\newcommand{\TT}[1]{\begin{tabular}[t]{c}{\vphantom{\tib \hrih}%
+			\tib #1}\\\textit{#1a}\end{tabular}}
+\newcommand{\TTa}[1]{\begin{tabular}[t]{c}{\vphantom{\tib \hrih}%
+			\tib #1}\\\textit{#1}\end{tabular}}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{cccc}
+	\TT{k}	&\TT{kh}	&\TT{g}		&\TT{ng}\\
+	\TT{c}	&\TT{ch}	&\TT{j}		&\TT{ny}\\
+	\TT{t}	&\TT{th}	&\TT{d}		&\TT{n}\\
+	\TT{p}	&\TT{ph}	&\TT{b}		&\TT{m}\\
+	\TT{ts}	&\TT{tsh}	&\TT{dz}	&\TT{w}\\
+	\TT{zh}	&\TT{z}		&\TT{'}		&\TT{y}\\
+	\TT{r}	&\TT{l}		&\TT{sh}	&\TT{s}\\
+	\TT{h}	&\TTa{a}	\\
+\end{tabular}
+\end{center}
+\caption{\TibTeX\ in Transliteration and Tibetan: Alphabet}
+\end{table}
+
+\begin{table}
+\begin{center}
+\TTa{a} \TTa{i} \TTa{u} \TTa{e} \TTa{o}
+
+\end{center}
+\caption{\TibTeX\ in Transliteration and Tibetan: Basic Vowels}
+\end{table}
+
+\begin{table}
+\begin{center}
+\TT{tx} \TT{thx} \TT{dx} \TT{nx} \TT{shx} \TT{kshx}
+
+\end{center}
+\caption{\TibTeX\ in Transliteration and Tibetan: Sanskrit letters}
+\end{table}
+
+
+\begin{table}
+\begin{center}
+Seven basic consonants with aspiration \textit{h} {\tib h} subjoined:\\
+\TT{gh} \fbox{\TT{jh}} \TT{dh} \TT{bh} \TT{dzh} \TT{dxh} \TT{lh}
+
+\bigskip Nine basic consonants with \textit{y} {\tib y} subjoined:\\
+\TT{ky} \TT{khy} \TT{gy} \TT{py} \TT{phy} \TT{by} \TT{my}
+\fbox{\TT{ry}} \fbox{\TT{hy}}
+
+\bigskip Fifteen basic consonants with \textit{r} {\tib r} subjoined:\\
+\TT{kr}  \TT{khr} \TT{gr} \TT{tr}  \TT{thr} \TT{dr} \TT{pr}\\
+\TT{phr} \TT{br}  \TT{mr} \fbox{\TT{dzr}} \fbox{\TT{zr}}  \TT{shr} \TT{sr} \TT{hr} 
+
+\bigskip Six basic consonants with \textit{l} {\tib l} subjoined:\\
+\TT{kl} \TT{gl} \TT{bl} \TT{rl}  \TT{sl}  \TT{zl}
+
+\bigskip Seventeen basic consonants with \textit{wazur} subjoined:\\
+\TT{kw} \TT{khw} \TT{gw} \TT{cw} \fbox{\TT{chw}}  \TT{nyw}  \TT{tw} \TT{dw} \TT{tsw}\\
+\TT{tshw} \TT{zhw} \TT{zw} \TT{rw} \TT{lw}  \TT{shw}  \TT{sw} \TT{hw}
+
+\bigskip Twelve basic consonants with \textit{r} {\tib r} surmounting them:\\
+\TT{rk} \TT{rg} \TT{rng} \TT{rj}  \TT{rny}  \TT{rt}\\
+\TT{rd}  \TT{rn} \TT{rb} \TT{rm} \TT{rts}  \TT{rdz}
+
+\bigskip Ten basic consonants with \textit{l} {\tib l} surmounting them:\\
+\TT{lk} \TT{lg} \TT{lng} \TT{lc}  \TT{lj}
+\TT{lt}  \TT{ld} \TT{lp} \TT{lb} \TT{lh} 
+
+\bigskip Eleven basic consonants with \textit{s} {\tib s} surmounting them:\\
+\TT{sk} \TT{sg} \TT{sng} \TT{sny}  \TT{st}
+\TT{sd}  \TT{sn} \TT{sp} \TT{sb} \TT{sm} \TT{sts}
+
+\end{center}
+\caption{\TibTeX\ in Transliteration and Tibetan: Composites I}
+\end{table}
+
+\begin{table}
+\begin{center}
+\TF{bhy} \TT{nr}  \TT{dxh} \TF{drw} \TT{grw} \TT{phyw} \TT{rgw} \TT{rtsw}\\
+\TT{rgy} \TT{rky} \TT{rmy} \TT{skr} \TT{sgr} \TT{smr}  \TT{spr} \TT{sbr}\\
+\TT{sgy} \TT{sky} \TT{smy} \TT{spy} \TT{sby} \TF{snr}
+\end{center}
+\caption{\TibTeX\ in Transliteration and Tibetan: Composites II}
+\end{table}
+
+
+
+\subsection{Known Transliteration Problems\label{TransliterationProblems}}
+
+The transliteration services of \TibTeX\ are coded in the ligature
+table of the font implying that these services know a lot about adjacent
+letters but know next to nothing about Tibetan syllables. The approach
+follows thus always a ``first match'' and not a ``correct match'' method.
+It is hence possible that consonant clusters are converted to Tibetan
+glyphs in a manner which was not intended by the writer. The hyphen
+\verb|-| helps solve these ambiguities:
+
+\exa
+	The syllable \emph{brtsams} is \\
+	{\tib b-rtsams}, not {\tib brtsams}!
+\exb
+	\begin{verbatim}
+	The syllable \emph{brtsams} is \\
+	{\tib b-rtsams}, not {\tib brtsams}!
+	\end{verbatim}
+\exc
+
+
+\subsection{Diacritical Marks}
+
+Thanks to Sam Sirlin's work, this version of \TibTeX\ provides a
+whole range of diacritical marks; most of them can be invoked with a 
+rather lengthy command name, but for some of them there is also a
+short character mnemonic. Please consult table \ref{SpecialDiacritics} on
+page~\pageref{SpecialDiacritics}.
+
+\newcommand{\TC}[2]{%
+	\tt\string#1	& \tt\string#2 & {\tib#1} \\
+	}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{llc}
+	Generic Name & Alternative & Symbol \\\hline
+\TC{\tibvarfive			}{}
+\TC{\tibvarsix			}{}
+\TC{\tibvarseven		}{}
+\TC{\tibvareight		}{}
+\TC{\tibvarnine			}{}
+\TC{\tibempty			}{}
+\TC{\tibShad			}{.}
+\TC{\tibTsheg			}{,}
+\TC{\tibSwasti			}{\swasti}
+\TC{\tibVisarga			}{:}
+\TC{\tibTshegshad		}{!}
+\TC{\tibAlttshegshad		}{}
+\TC{\tibNyistshegshad		}{}
+\TC{\tibChemgoshad		}{}
+\TC{\tibSbrulshad		}{}
+\TC{\tibRgyagramshad		}{}
+\TC{\tibVarchemgoshad		}{}
+\TC{\tibRjessungaro		}{}
+\TC{\tibSnaldan			}{}
+\TC{\tibRnambcad		}{}
+\TC{\tibGtertsheg		}{}
+\TC{\tibRinchenspungsshad	}{}
+\TC{\tibTopiniyigmgomdunma	}{(}
+\TC{\tibFinalyigmgomdunma	}{)}
+\TC{\tibIniyigmgomdunma		}{((}
+\TC{\tibAngkhyanggyon		}{<}
+\TC{\tibAngkhyanggyas		}{>}
+\TC{\tibHalanta			}{}
+\TC{\tibLcirtags		}{}
+\TC{\tibNyizlanaada		}{}
+\TC{\tibHalf			}{}
+\TC{\tibGteryigmgotr		}{}
+\TC{\tibPaluta			}{}
+\end{tabular}
+\end{center}
+\caption{\TibTeX\ Special Diacritics\label{SpecialDiacritics}}
+\end{table}
+
+\section{Example}
+
+The following text, ``The Story of \emph{Yug-pa-\`can} the  Brahman'',
+is blatantly stolen from Sirlin's \texttt{/doc/} directory. Some of the
+input conventions have, however, changed slightly, and so the full text
+in romanized source and Tibetan target forms is given here. Please note
+that the word and sentence spaces are not identical with those of Sirlin's
+and Steiner's systems, hence the line and paragraph layout is not completely
+identical. Modifications of input syntax are shown in the margins.
+
+\newcommand{\Kcommand}{\texttt{\char92 K}}
+\newcommand{\brahmastory}{%
+	.yul zhig na bram ze dbyug pa can zhes bya zhig 'dug ste.
+	rab du dbul 'phongs pa bza' ba dang,. bgo med pa zhig go.
+	des khyim bdag cig las ba glang zhig b-rnyes te. nyin par
+	spyad nas ba glang de khrid de khyim bdag de'i khyim du song
+	ba dang,. de na khyim bdag ni zan za ste. dbyug pa can gyis ba
+	glang de khyim gyi nang du btang ba dang,. ba glang sgo gzhan
+	du song nas stor ro..  khyim bdag de zan de zos nas langs pa
+	dang,. de na ba glang ma mthong nas des dbyug pa can la glang
+	ga re zhes byas pa dang,. des smras pa. khyod kyi khyim du btang
+	ngo,. .khyod kyis nga'i glang bor gyis slar byin cig ces smras
+	pa dang,. des smras pa. ngas ma bor ro..  de nas de gnyis 'grogs
+	te. rgyal po'i thad du 'dong ba dang,. 'u bu cag gi rigs pa dang
+	mi rigs pa rtog par 'gyur ro zhes smras nas de gnyis dong ba
+	dang,. mi gzhan zhig gi rta rgod ma zhig bros nas. des dbyug pa
+	can la smras pa. rgod ma ma btang zhes smras pa dang,. des rdo
+	zhig blangs te 'phangs pa dang rta'i rkang pa la phog nas rkang
+	pa bcag go\Kcommand\marginpar{\small \texttt{\char92 K} eliminates
+		the \textit{tsheg} and inserts a long space.} .des smras
+	pa. khyod kyis nga'i rta bsad kyis nga'i rta byin cig\Kcommand\
+	.ci'i phyir rta sbyin. des smras pa tshur shog\Kcommand\
+	.rgyal po'i drung du 'dong dang,. 'u bu cag gi zhal che gcod du
+	'ong ngo zhes smras nas. de dag der song ba dang,. dbyug pa can
+	des 'bras par b-rtsams te. des rtsig pa zhig gi steng nas mchongs
+	pa dang,. de'i drung na tha ga pa zhig thags 'thag cing 'dug pa
+	de'i steng du lhung nas tha ga pa de tshe 'phos pa dang,. tha ga
+	pa'i chung mas dbyug pa can de bzung nas. khyod kyis nga'i khyo
+	bsad kyis nga'i khyo byin zhig ces smras pa dang,. ngas khyod kyi
+	khyo ci ltar sbyin zhes smras nas. tshur shog rgyal po'i drung du
+	'dong ngo,.. des 'u bu cag gi zhal ce gcad do zhes dong ba las.
+	lam gyi bar na chu bo gting zab po zhig yod de. chu de'i nang
+	nas tshur shing mkhan zhig te'u kha na 'khyer te 'ong ngo,. de la
+	dbyug pa can gyis chu'i gting ci tsam zhes dris pa dang,. chu'i
+	gting zab bo zhes smras pas ste'u chur lhung ste. ste'u ma rnyer
+	pa dang,. des dbyug pa can bzung nas. khyod kyis nga'i ste'u
+	chur bskyur ro.. des smras pa ngas ma bskyer ro.  .tshur shog
+	rgyal po'i drung du 'dong dang,. des 'u bu cag gi zhal che gcad
+	do zhes smras nas dong ngo,.  {\bit$\ldots continued \ldots$}%
+}
+
+\begin{quote}
+\verb*-\swasti. - \brahmastory
+\end{quote}
+
+\renewcommand{\Kcommand}{\K}
+{\tib\swasti. \brahmastory}
+
+\section{Legal Issues}
+
+\TibTeX\ is published under the GNU Public Licence. And very much like
+I did when I picked up the work of my predecessors and changed a few
+things here and there, I warmly welcome to change and improve everything,
+but then: please rename the files. If not for the sake of source protection,
+then at least for making sure that various \TeX\ installations around the
+world do not get confused.
+
+\section{Outlook and Desiderata}
+
+At the time of this writing, \TibTeX\ is actually already
+outdated as $\Omega$mega, the Unicode-capable \TeX\ successor, is 
+available. Why, then, did I undergo this effort? I needed Tibetan now,
+for ongoing Mongolian lexicographical work which is all done using
+\LaTeXe\ and Mon\TeX.
+
+Though the font provided by Schwartz, Sparkes and Sirlin is already
+useful, I keep dreaming of a true Tibetan \emph{Meta}font, not just
+outlines created by GNU \texttt{fontutils}. Such a genuine metafont
+would greatly facilitate the creation of new and different typefaces,
+at least with different weights, and the few Unicode characters not
+yet covered could then be produced easily.
+
+Though this is a work slightly more targeted at $\Omega$mega than at
+\LaTeXe, I am seriously considering preparing full-fledged Native
+Language Support for the standard document formats implying that all
+captions and the date and number formats have to be translated into
+Tibetan. With transliteration services provided internally, it should
+also be possible to integrate Tibetan into the Babel system.
+
+Anyway, whatever the mistakes and the shortcomings are that have now
+crept into this Tibetan system, I can only kindly ask you to blame me,
+not my predecessors any more.
+\end{document}
