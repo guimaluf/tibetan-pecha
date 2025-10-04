@@ -1,10 +1,9 @@
 \documentclass{article}
 \usepackage{fontspec}
-
-\fontspec [ Path = fonts ]{tib}
-% \def\yig{{\protect\tibetan ༃  \char"0F03}}
+%\newfontfamily\tibetan{TibMachUni.ttf}
+%\def\yig{{\protect\tibetan ༃  \char"0F03}}
 \begin{document}
-% \scalebox{5}{\yig}
+%\scalebox{5}{\yig}
 \bgroup
 \LARGE\tibetan
 \noindent༆ །ཨ་ཡིག་དཀར་མཛེས་ལས་འཁྲུངས་ཤེས་བློ  འི་\par
@@ -14,3 +13,17 @@
 བསྒྲོགས
 \egroup
 \end{document}
+
+% \documentclass{article}
+% 
+% \usepackage{polyglossia}
+% \setdefaultlanguage[variant=british]{english}
+% \setotherlanguage{tibetan}
+% %\setmainfont{Charis SIL}
+% \newfontfamily{\tibetanfont}[Scale=1.415]{TibetanMachineUni}
+% 
+% \setlength{\parindent}{0pt}
+% 
+% \begin{document}
+% the \texttibetan{རྫོང་} \textbf{dzong} ‘fortress’\\
+% \end{document}
