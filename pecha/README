@@ -1,0 +1,15 @@
+Package name:           pecha
+Package author:         Dieter Jäger
+
+Version/Release:        0.1
+
+Features:               The pecha class provides an environment 
+                        for writing Tibetan on LaTeX2e in the 
+			traditional Tibetan Pecha layout, using 
+                        the cTibTeX package by Oliver Corff.
+
+Required packages:	cTibTeX, rotating
+
+Installation:
+
+10. November 2004

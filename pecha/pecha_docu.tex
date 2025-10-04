@@ -1,0 +1,142 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{ctib}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{verbatim}
+\usepackage{times}
+
+%opening
+\title{Pecha Class V0.1 Documentation}
+\author{Dieter Jäger}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The \LaTeX2e~package \TibTeX~ by Oliver Corff provides easy support to write Tibetan texts with Latex. 
+Based on the {\TibTeX}-package, this class provides suport for printing Tibetan texts in the traditional Tibetan Longbook format used for sacred texts (pecha, {\tiny \tib dpe cha.}).
+\end{abstract}
+
+\section{Why I did this}
+The reson to begin this work was quite simple: I needed to create some pechas and could not find any appropriate software which is system independent and open source. There are some project using proprietary software. But these are either completly proprietary or, even worse, use commercial word processors. \LaTeX2e was the only high quality software which provided an easy to use method for Tibetan text input. So I decided to start this project on \LaTeX2e with \TibTeX. 
+
+The current version should be considered as an early experimental release. It already works on my behalf but may cause lots of problems on other systems.
+
+\section{Installation}
+The Files:
+\begin{description}
+\item[pecha.cls] The class file itself
+\item[ctibmantra.sty] A style file which provides some mantra stacks.
+\item[example.ps] A sample Postscript file.
+\item[example.pdf] The sample as PDF.
+\item[example.tex] The example's source.
+\item[pecha\_doc.pdf] The documentation as PDF file.
+\item[pecha\_doc.tex] The documentation source.
+\item[CHANGES] Changes in the current version of pecha.cls
+\item[COPYING] A copy of the GNU Public License.
+\item[README] A short user information.
+\end{description}
+Currently no installation mechanism is provided. Simply copy the file pecha.cls to your working directory or to your \LaTeX~ directory tree. The file ctibmantry.sty contains some Mantra stacks which you can install in the same way as pecha.cls.
+
+\section{What it does}
+Each page is printed centered in landscape orientation, 5 to 6 lines each. The text is surrounded by like in the traditional Tibetan scriptures. You can choose different styles for this frame. The text may contain either of Tibetan or Latin letters, using the according \TibTeX~commands. Using the \verb-\title- and \verb-\maketitle- macros you can create a pecha style title page. Using the class option \verb-rotate- even pages will be rotated by 180 degrees, making it easier to get a propper double sided printout. Finally the text in the left and right boxes can be modified using special macros.
+
+\section{\LaTeX packages used}
+The class file uses the following \LaTeX2e~packages:
+\begin{description}
+\item[rotate.sty] It is needed to printout the margin boxes, which contain sheet number and text titles rotated by 90 degrees. 
+\item[ctib.sty] The left margin boxes will contain the sheet number and some additional text in Tibetan. 
+\end{description} 
+
+\section{Class options}
+\begin{description}
+\item[8pt,9pt,10pt,11pt,12pt] These are the font sizes you can use. For the sizes 8pt and 9pt the package ,,extsizes.sty'' must be installed 
+\item[a4paper, a5paper, b5paper, letterpaper, legalpaper, executivepaper] These are standard \LaTeX2e~paper sizes. You may get strange results with the smaller ones like A5 or B5. All formats will be used in landscape orientation
+\item[a4pecha3,a4pecha2,a5pecha3,a5pecha2,\ldots] These are based on the standard page sizes. The page height is modified to fit 2 or three pecha pages on one large page. For example \verb-a4pecha3- creates pages of the size 297mmx70mm. You can arrange 3 of those pages on one DIN A4 page. Here is one example: Output of 6 pages per A4 paper, 3 on the front, 3 rotated 180 degrees on the back:\\
+The LaTeX Preamble would contain:
+\begin{verbatim}
+\documentclass[a4pecha3,9pt,rotate]{pecha}
+\end{verbatim}
+\ldots\\\\
+To create the postscript you could use:\\
+\begin{verbatim}
+# latex <example>.tex
+# dvips <example>.dvi
+\end{verbatim}
+Finally to rearrange the pages you could use some postscript tools:
+\begin{verbatim}
+# psresize -p a4 -W 297mm -H 70mm <example>.ps <example>_a4.ps
+# pstops -w 297mm -h 210mm  '6:0(-70mm,0)+2+4(70mm,0), \\
+      1(-70mm,0)+3+5(70mm,0)' <example>_a4.ps <example>_3p.ps
+\end{verbatim}
+The first command resizes the page to fit on A4 paper. The second command rearranges the pages in the document, so that subsequent pages are placed one to one on front and back page.
+\item[rotate] This will rotate even pages by 180 degrees. This may be usefull for duplex output.
+\item[doubleframe, simpleframe, fancyframe] These options define the page frames. The default ,,doubleframe'' will print a double lined frame around each page, ,,simpleframe'' a single lined frame. "fancyframe" will create a more - well, fancy - frame.
+\item[narrowpage,mediumpage,widepage,extrawide] These will change the height of the output pages. Default is \verb-medium-.  
+\item[septitle] Like Tibetan texts, the content starts on the backpage of the titlepage. Using this option will insert an empty page, so that the content starts on a seperate sheet.
+\end{description} 
+
+\section{Class specific macros}
+This class allows you to define a title page as well as the pecha specific ''marginal headers''. The title {\sc must} be the first element of your text, otherwise it will mess the output. If you want to change the ''marginal headers'' at any place in your document, you need to insert a \verb-newline- before each new definition. Otherwise the newly defined margin will spread to the previous \verb-\newline-. If you find a margin header in the output at a page you did not expect it to be, you should check this. Remember that an empty line resembles the \verb-\newline- command like in this
+\emph{Example}:
+\begin{quote}
+   \begin{verbatim}
+     \oddleft{first}{title}
+     \input{sometext}
+
+     \oddleft{second}{title}
+     \input{anothertext}
+    \end{verbatim}
+\end{quote}
+
+These are the macros you can use:
+\begin{description}
+
+\item[$\backslash title\{some\ title\ text\}$] Define the text of the titlepage. Unlike other \LaTeX2e~style you cannot use \verb-\author- or \verb-\date-. These would not make any sense in this context.
+
+\item[$\backslash maketitle$] This adds a title page with the contents defined in the \verb-\title- macro. If you wanted to have a title page, you cannot add any text before \verb-\maketitle-. Otherwise your output will be messed up. Except when using the Class option \verb-septitle-, numbering begins on the titlepage. The sheet number appears on the left side of the title frame. If you wished to also have the short title in this section, make shure that you defined \verb-\oddleft- \emph{before} the \verb-\maktitle-\ command.
+
+\item[$\backslash oddleft\{left\ text\}\{right\ text\}$] The left margin of odd numbered pages. This one is quite special in Tibetan texts: The sheet number is printed centered while a short title is wrapped around. To reproduce this style, \verb-\oddleft- is used with two parameters, which contain the text left and right of the sheet number. You can leave any of them empty.  The page number will always be output centered. You can leave any of them empty. The sheet number will be printed even if you do not call this makro. The text is printed in Tibetan letters by default. The sheet number will be printed Tibetan in any case.
+
+\item[$\backslash oddright\{text\}$] Tibetan texts do not contain any text in the right margin box. But because my Tibetan reading is not so fluent, I print the page number in Latin letters here. The text will be printed in Latin letters by default.
+
+\item[$\backslash evenleft\{text\}$] This usually contains a Tibetan short title or the name of the text cycle. The text will be printed in Tibetan letters by default.
+
+\item[$\backslash evenright\{text\}$] Again this is not filled in Tibetan.  I use to print the English or German title and the page number to this box. The text again will be printed in Latin letters as a default.
+
+\item[$\backslash tibsmall\{text\}$] Comments can be printed in \verb-footnotesize- using this simple makro.
+
+\item[$\backslash pechasheet$] This counter contains the sheet number. \verb-\thepechasheet- contains the current sheet number. You can use 
+\begin{quote}
+	\verb-\setcounter{\pechasheet}{count}- 
+\end{quote}
+to change the sheet number.
+\item[$\backslash newsheet$] Begin a new sheet. This will insert an empty page if necessary.
+\end{description} 
+
+\section{Example}
+In this example, a title will be printed in Latin letters on the first sheet. The outputframe is the single lined frame. The left odd page margin contains the sheet number and the text {\tiny\tib dpe cha} on odd pages, and {\tiny\tib bod skad} on even pages. The odd left margin contains the page number in Latin letters. All even pages will be rotated by 180 degrees. The Tibetan text has been stored in a file named ,,text.tex''. The pages are 297mmx70mm in size.
+
+\begin{verbatim}
+\documentclass[a4pecha3,rotate,simple]{pecha}
+\title{\bit This is an example}
+
+\begin{document}
+\oddleft{dpe}{cha}
+\evenleft{bos skad}
+\oddright{page \thepage}
+\maketitle
+
+\tib
+\input{text}
+
+\end{verbatim} 
+
+\section{Legal Terms}
+This package is published under the GNU General Public License (GPL). Please read the file COPYING for Details. I would appreciate any suggestions to improve this software. You can contact me through this email: pecha.project@linuxjaeger.de
+
+\section{Drawbacks}
+The limitation of Metafont to 256 Glyphs is a big problem as soon as you need to input Sanscrit transliteration stacks. As a workaround, many stacks can be created with macros. This directory contains the ctibmantra.sty package file, which is simply a collection of those stacks I currently use.
+
+\end{document}

@@ -1,0 +1,18 @@
+OBJECTS = tfilt.o	tparse.o	util.o	table.o
+
+all:		tfilt
+
+tfilt:		$(OBJECTS)
+		cc -o tfilt $(OBJECTS)
+
+tfilt.o:	tfilt.c	table.h	token.h
+
+tparse.o:	tparse.c	table.h	token.h
+
+util.o:		util.c	table.h	token.h
+
+table.o:	table.c	table.h
+
+clean:
+		rm -f $(OBJECTS) core tfilt
+
