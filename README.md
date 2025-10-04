@@ -2,6 +2,8 @@
 
 * [Dudjom Tersar Ngöndro](dudjom-tersar-ngondro/)
 * [Prajna Paramita](prajnaparamita/)
+* [Chuva de bençãos](tsigdun-soldeb-naldjor)
+* []
 
 ### Requirements
 
