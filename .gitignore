@@ -1,0 +1,30 @@
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.bbl
+*.blg
+*.brf
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.nav
+*.snm
+*.vrb
+*.xdv
+
+# PDF output (except curated example)
+*.pdf
+!pecha-example.pdf
+
+# Editor temp files
+*~
+*.swp
+*.swo
+.DS_Store
+
+# Build dirs
+_build/

@@ -9,10 +9,12 @@
 \bool_new:N \g_pecha_unicode_bool
 \bool_new:N \g_pecha_wylie_bool
 \bool_new:N \g_pecha_rotate_bool
+\bool_new:N \g_pecha_duplex_bool
 \bool_new:N \g_pecha_singleframe_bool
 \bool_new:N \g_pecha_fancyframe_bool
 \bool_new:N \g_pecha_septitle_bool
 \bool_new:N \g_pecha_has_title_bool
+\bool_new:N \g_pecha_noframe_bool
 
 \bool_set_true:N \g_pecha_unicode_bool
 \bool_set_false:N \g_pecha_wylie_bool
@@ -21,6 +23,8 @@
 \bool_set_false:N \g_pecha_fancyframe_bool
 \bool_set_false:N \g_pecha_septitle_bool
 \bool_set_false:N \g_pecha_has_title_bool
+\bool_set_false:N \g_pecha_duplex_bool
+\bool_set_false:N \g_pecha_noframe_bool
 
 \DeclareOption{wylie}{
   \bool_set_true:N \g_pecha_wylie_bool
@@ -93,6 +97,10 @@
 }
 
 \DeclareOption{rotate}{\bool_set_true:N \g_pecha_rotate_bool}
+\DeclareOption{duplex}{
+  \bool_set_true:N \g_pecha_duplex_bool
+  \bool_set_false:N \g_pecha_rotate_bool
+}
 \DeclareOption{fancyframe}{
   \bool_set_true:N \g_pecha_singleframe_bool
   \bool_set_true:N \g_pecha_fancyframe_bool
@@ -142,7 +150,6 @@
   }
 }
 
-\dim_new:N \g_pecha_margin_dim
 \dim_new:N \g_pecha_marginht_dim
 \dim_new:N \g_pecha_margindp_dim
 \dim_new:N \g_pecha_pechadim_dim
@@ -150,10 +157,13 @@
 \dim_new:N \g_pecha_pechawidth_dim
 \dim_new:N \g_pecha_textwidth_saved_dim
 \dim_new:N \g_pecha_titlewidth_dim
+\dim_new:N \g_pecha_outermargin_dim
+\dim_new:N \g_pecha_innermargin_dim
 
-\dim_set:Nn \g_pecha_margin_dim {0.6in}
 \dim_set:Nn \g_pecha_marginht_dim {3ex}
 \dim_set:Nn \g_pecha_margindp_dim {1ex}
+\dim_set:Nn \g_pecha_outermargin_dim {8mm}
+\dim_set:Nn \g_pecha_innermargin_dim {3ex}
 
 \newcounter{pechasheet}
 \setcounter{pechasheet}{1}
@@ -163,7 +173,7 @@
 \dim_gadd:Nn \g_pecha_pechadim_dim { 2\g_pecha_marginht_dim }
 \dim_gadd:Nn \g_pecha_pechadim_dim { 2\g_pecha_margindp_dim }
 
-\dim_set:Nn \textwidth { \paperwidth - 2\g_pecha_margin_dim }
+\dim_set:Nn \textwidth { \paperwidth - 2\g_pecha_outermargin_dim }
 \dim_gset_eq:NN \g_pecha_pechawidth_dim \textwidth
 \dim_gset:Nn \g_pecha_titledim_dim { 0.2\textwidth }
 
@@ -187,12 +197,9 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{12pt}
 
-\dim_set:Nn \topmargin { \paperheight - \textheight }
-\dim_set:Nn \topmargin { 0.5 \topmargin - 1.1in }
-
-\dim_set:Nn \oddsidemargin { \paperwidth - \g_pecha_pechawidth_dim }
-\dim_set:Nn \oddsidemargin { 0.5 \oddsidemargin - 1.5\g_pecha_margin_dim }
+\dim_set:Nn \oddsidemargin {0pt}
 \dim_set_eq:NN \evensidemargin \oddsidemargin
+\dim_set:Nn \topmargin {0pt}
 
 \pagenumbering{arabic}
 
@@ -208,6 +215,11 @@
   \dim_set_eq:NN \pdfpagewidth \paperwidth
   \dim_set_eq:NN \pdfpageheight \paperheight
 }
+
+\hsize=\textwidth
+
+\hoffset=-1in
+\voffset=-1in
 
 \pagestyle{empty}
 
@@ -232,6 +244,37 @@
 }
 \newcommand{\evenright}[1]{
   \tl_gset:Nn \g_pecha_eright_tl {#1}
+}
+
+\tl_new:N \g_pecha_author_tl
+\tl_new:N \g_pecha_translatedauthor_tl
+\tl_new:N \g_pecha_subtitle_tl
+\tl_new:N \g_pecha_date_tl
+
+\newcommand{\shorttitle}[2]{
+  \oddleft{#1}{#2}
+}
+
+\newcommand{\translatedtitle}[1]{
+  \oddright{#1}
+  \evenright{#1}
+}
+
+\renewcommand{\author}[1]{
+  \tl_gset:Nn \g_pecha_author_tl {#1}
+  \evenleft{#1}
+}
+
+\newcommand{\translatedauthor}[1]{
+  \tl_gset:Nn \g_pecha_translatedauthor_tl {#1}
+}
+
+\newcommand{\subtitle}[1]{
+  \tl_gset:Nn \g_pecha_subtitle_tl {#1}
+}
+
+\renewcommand{\date}[1]{
+  \tl_gset:Nn \g_pecha_date_tl {#1}
 }
 
 \tl_new:N \g_pecha_title_tl
@@ -387,72 +430,38 @@
 
 \let\titlepage\pechatitlepage
 
-\dim_new:N \l_tmpc_dim
-
 \newcommand{\makepechatitle}{
   \bool_set_true:N \g_pecha_has_title_bool
   \hbox_set:Nn \l_tmpa_box { \parbox{\g_pecha_titlewidth_dim}{
-    \centering { \pechatibfont \g_pecha_title_tl } \par
-  }}
-  \dim_set:Nn \l_tmpa_dim { \textwidth - 12pt - 10em - \box_wd:N \l_tmpa_box }
-  \dim_set:Nn \l_tmpa_dim { 0.5\l_tmpa_dim }
-  \dim_compare:nNnT {\l_tmpa_dim} < {0em} { \dim_set:Nn \l_tmpa_dim {0em} }
-  \dim_set:Nn \l_tmpb_dim { \textheight - 4pt - 5em - \box_ht:N \l_tmpa_box - \box_dp:N \l_tmpa_box }
-  \dim_set:Nn \l_tmpb_dim { 0.5\l_tmpb_dim }
-  \dim_compare:nNnT {\l_tmpb_dim} < {0em} { \dim_set:Nn \l_tmpb_dim {0em} }
-  \begin{pechatitlepage}
-    \hbox{
-      \kern \l_tmpa_dim
-      \vbox{
-        \kern \l_tmpb_dim
-        \hrule
-        \hbox{
-          \vrule\kern 1.5pt
-          \vbox{\kern 1.5pt\hrule
-            \hbox{\vrule
-              \bool_if:NT \g_pecha_septitle_bool {
-                \kern 2em
-              }
-              \bool_if:NF \g_pecha_septitle_bool {
-                \pecha_title_numlabel:
-              }
-              \vbox{\kern 2.5em\hrule
-                \hbox{\vrule\kern 1.5pt
-                  \vbox{\kern 1.5pt\hrule
-                    \hbox{\vrule\kern 4em
-                      \pecha_doubleruler:\kern 2em\pecha_doubleruler:
-                      \kern 1em\box_use:N \l_tmpa_box\kern 1ex
-                      \pecha_doubleruler:\kern 2em\pecha_doubleruler:\kern 4em\vrule
-                    }
-                    \hrule\kern 1.5pt
-                  }\kern 1.5pt\vrule
-                }\hrule\kern 2.5em
-              }\kern 2.5em\vrule
-            }\hrule\kern 1.5pt
-          }\kern 1.5pt\vrule
-        }\hrule\vfill
-      }\hfill
+    \centering
+    { \pechatibfont \g_pecha_title_tl } \par\medskip
+    \tl_if_empty:NF \g_pecha_translatedauthor_tl {
+      \textit{ \g_pecha_translatedauthor_tl } \par\smallskip
     }
+    \tl_if_empty:NF \g_pecha_subtitle_tl {
+      { \pechatibfont \g_pecha_subtitle_tl } \par\smallskip
+    }
+    \tl_if_empty:NF \g_pecha_date_tl {
+      \small \g_pecha_date_tl \par
+    }
+  }}
+  \begin{pechatitlepage}
+    \box_use:N \l_tmpa_box
   \end{pechatitlepage}
 }
 \let\maketitle\makepechatitle
 
 \cs_new:Npn \pecha_title_numlabel: {
-  \dim_set:Nn \l_tmpc_dim { \textheight - 2\l_tmpb_dim - 1em }
   \hbox_set:Nn \l_tmpa_box {
-    \hbox_to_wd:nn { \l_tmpc_dim } {
+    \hbox_to_wd:nn { \textheight } {
       \scriptsize\pechatibfont
-      \bool_if:NTF \g_pecha_unicode_bool {
-        \g_pecha_oleft_tl \hfil \tibnumeral{\thepechasheet} \hfil \g_pecha_oleft_alt_tl
-      }{
-        \tib \g_pecha_oleft_tl \hfil \tibnumeral{\thepechasheet} \hfil \g_pecha_oleft_alt_tl \bit
-      }
+      \g_pecha_oleft_tl \hfil \tibnumeral{\thepechasheet} \hfil \g_pecha_oleft_alt_tl
     }
   }
   \box_set_ht:Nn \l_tmpa_box { \g_pecha_marginht_dim }
   \box_set_dp:Nn \l_tmpa_box { \g_pecha_margindp_dim }
   \kern \box_dp:N \l_tmpa_box
-  \rotatebox{-90}{\kern -\l_tmpc_dim \kern -0.8em \box_use:N \l_tmpa_box}
+  \rotatebox{-90}{\kern -\textheight \box_use:N \l_tmpa_box}
 }
 
 \cs_new:Npn \pecha_oddleft: {
@@ -468,13 +477,12 @@
   }
   \box_set_ht:Nn \l_tmpa_box { \g_pecha_marginht_dim }
   \box_set_dp:Nn \l_tmpa_box { \g_pecha_margindp_dim }
-  \rotatebox{-90}{\kern -\textheight \kern -1em \box_use:N \l_tmpa_box}
+  \rotatebox{-90}{\kern -\textheight \box_use:N \l_tmpa_box}
 }
 
 \cs_new:Npn \pecha_evenleft: {
   \hbox_set:Nn \l_tmpa_box {
     \skip_horizontal:n { -\textheight }
-    \kern -1em
     \hbox_to_wd:nn { \textheight } {
       \scriptsize\pechatibfont
       \bool_if:NTF \g_pecha_unicode_bool {
@@ -524,13 +532,12 @@
   }
   \box_set_ht:Nn \l_tmpa_box { \g_pecha_marginht_dim }
   \box_set_dp:Nn \l_tmpa_box { \g_pecha_margindp_dim }
-  \rotatebox{-90}{\skip_horizontal:n { -\textheight } \kern -1em \box_use:N \l_tmpa_box}
+  \rotatebox{-90}{\skip_horizontal:n { -\textheight } \box_use:N \l_tmpa_box}
 }
 
 \cs_new:Npn \pecha_evenfancy: {
   \hbox_set:Nn \l_tmpa_box {
     \skip_horizontal:n { -\textheight }
-    \kern -1em
     \hbox_to_wd:nn { \textheight } {
       \footnotesize\pechatibfont
       \bool_if:NTF \g_pecha_unicode_bool {
@@ -555,13 +562,15 @@
             \vbox{
               \hbox{
                 \l_pecha_theleft_tl
-                \pecha_doubleruler:\kern 0.5em
-                \vbox{
-                  \kern 1.5ex
+                \pecha_doubleruler:\kern \g_pecha_innermargin_dim
+                \vbox to \textheight{
+                  \vss
+                  \kern \g_pecha_innermargin_dim
                   \box_use:N #1
-                  \kern 1.5ex
+                  \kern \g_pecha_innermargin_dim
+                  \vss
                 }
-                \pecha_doubleruler:
+                \pecha_doubleruler:\kern \g_pecha_innermargin_dim
                 \l_pecha_theright_tl
               }
             }
@@ -581,10 +590,12 @@
           \hbox{
             \l_pecha_theleft_tl
             \vrule\kern 0.5em
-            \vbox{
-              \kern 1.5ex
+            \vbox to \textheight{
+              \vss
+              \kern \g_pecha_innermargin_dim
               \box_use:N #1
-              \kern 1.5ex
+              \kern \g_pecha_innermargin_dim
+              \vss
             }
             \vrule
             \l_pecha_theright_tl
@@ -615,7 +626,7 @@
                   \hrule
                   \hbox{
                     \kern 4em\pecha_doubleruler:\kern 2em\pecha_doubleruler:\kern 0.5em
-                    \vbox{\box_use:N #1}
+                    \vbox to \textheight{ \vss \kern \g_pecha_innermargin_dim \box_use:N #1 \kern \g_pecha_innermargin_dim \vss }
                     \pecha_doubleruler:\kern 2em\pecha_doubleruler:\kern 4em
                   }
                   \hrule
@@ -642,87 +653,84 @@
     \normalsize
     \normalsfcodes
     \@parboxrestore
-    \int_if_odd:nTF {\count\z@} {
-      \let\@themargin\oddsidemargin
-    }{
-      \let\@themargin\evensidemargin
-    }
     \setbox\@outputbox\vbox{\hfil\box\@outputbox\hfil}
     \bool_if:NTF \g_pecha_has_title_bool {
-      \setbox\@outputbox\hbox{\pecha_titlepage_output:n {\@outputbox}}
+      \bool_if:NTF \g_pecha_septitle_bool {
+        \tl_set:Nn \l_pecha_theleft_tl {}
+      }{
+        \tl_set:Nn \l_pecha_theleft_tl { \pecha_title_numlabel: }
+      }
+      \tl_set:Nn \l_pecha_theright_tl {}
+      \setbox\@outputbox\hbox{ \pecha_selectframe:n {\@outputbox} }
+      \bool_set_false:N \g_pecha_has_title_bool
     }{
       \int_if_odd:nTF {\c@page} {
-        \tl_set:Nn \l_pecha_theleft_tl { \pecha_oddleft: }
-        \tl_set:Nn \l_pecha_theright_tl { \pecha_oddright: }
-        \bool_if:NTF \g_pecha_fancyframe_bool {
-          \setbox\@outputbox\hbox{\pecha_fancyframe:n {\@outputbox}}
+        \bool_if:NTF \g_pecha_duplex_bool {
+          \tl_set:Nn \l_pecha_theleft_tl { \pecha_oddleft: }
+          \tl_set:Nn \l_pecha_theright_tl { \pecha_oddright: }
         }{
-          \bool_if:NTF \g_pecha_singleframe_bool {
-            \setbox\@outputbox\hbox{\pecha_singleframe:n {\@outputbox}}
-          }{
-            \setbox\@outputbox\hbox{\pecha_doubleframe:n {\@outputbox}}
-          }
+          \tl_set:Nn \l_pecha_theleft_tl { \pecha_oddleft: }
+          \tl_set:Nn \l_pecha_theright_tl { \pecha_oddright: }
         }
+        \setbox\@outputbox\hbox{\pecha_selectframe:n {\@outputbox}}
       }{
-        \tl_set:Nn \l_pecha_theleft_tl { \pecha_evenleft: }
-        \tl_set:Nn \l_pecha_theright_tl { \pecha_evenright: }
+        \bool_if:NTF \g_pecha_duplex_bool {
+          \tl_set:Nn \l_pecha_theleft_tl { \pecha_oddleft: }
+          \tl_set:Nn \l_pecha_theright_tl { \pecha_oddright: }
+        }{
+          \tl_set:Nn \l_pecha_theleft_tl { \pecha_evenleft: }
+          \tl_set:Nn \l_pecha_theright_tl { \pecha_evenright: }
+        }
         \bool_if:NTF \g_pecha_rotate_bool {
           \setbox\@outputbox\hbox{
-            \rotatebox{180}{
-              \bool_if:NTF \g_pecha_fancyframe_bool {
-                \pecha_fancyframe:n {\@outputbox}
-              }{
-                \bool_if:NTF \g_pecha_singleframe_bool {
-                  \pecha_singleframe:n {\@outputbox}
-                }{
-                  \pecha_doubleframe:n {\@outputbox}
-                }
-              }
-            }
+            \rotatebox{180}{\pecha_selectframe:n {\@outputbox}}
           }
         }{
-          \bool_if:NTF \g_pecha_fancyframe_bool {
-            \setbox\@outputbox\hbox{\pecha_fancyframe:n {\@outputbox}}
-          }{
-            \bool_if:NTF \g_pecha_singleframe_bool {
-              \setbox\@outputbox\hbox{\pecha_singleframe:n {\@outputbox}}
-            }{
-              \setbox\@outputbox\hbox{\pecha_doubleframe:n {\@outputbox}}
-            }
-          }
+          \setbox\@outputbox\hbox{\pecha_selectframe:n {\@outputbox}}
         }
         \stepcounter{pechasheet}
       }
     }
-    \shipout\vbox{
-      \let\label\@gobble
-      \let\index\@gobble
-      \let\glossary\@gobble
-      \baselineskip\footskip
-      \@begindvi
-      \vskip\topmargin
-      \moveright\@themargin
-      \box\@outputbox
+    \shipout\vbox to \paperheight{
+      \vss
+      \hbox to \paperwidth{
+        \hss
+        \box\@outputbox
+        \hss
+      }
+      \vss
     }
     \set@typeset@protect
   \group_end:
   \stepcounter{page}
 }
 
-\cs_new:Npn \pecha_titlepage_output:n #1 {
-  \box_use:N #1
-  \bool_set_false:N \g_pecha_has_title_bool
+\cs_new:Npn \pecha_selectframe:n #1 {
+  \bool_if:NTF \g_pecha_noframe_bool {
+    \hbox{#1}
+  }{
+    \bool_if:NTF \g_pecha_fancyframe_bool {
+      \pecha_fancyframe:n {#1}
+    }{
+      \bool_if:NTF \g_pecha_singleframe_bool {
+        \pecha_singleframe:n {#1}
+      }{
+        \pecha_doubleframe:n {#1}
+      }
+    }
+  }
 }
 
 \newcommand{\pechaglosssize}{\fontsize{6pt}{7pt}\selectfont}
 \newcommand{\pechaglosscolor}{\color{gray}}
 \newcommand{\pechaglossfont}{\normalfont\pechaglosssize}
+\newcommand{\pechatextsize}{\large}
 
 \prop_new:N \g_pecha_gloss_prop
 \prop_new:N \g_pecha_seen_prop
 \seq_new:N \g_pecha_gloss_order_seq
 
-\cs_new_protected:Npn \pecha_gloss_render:nn #1#2 {
+\cs_new_protected:Npn \pecha_gloss_render:nnn #1#2#3 {
   \prop_if_in:NnTF \g_pecha_seen_prop {#1} {
     { \pechatibfont #1 }
     \skip_horizontal:n { 0.3em plus 0.1em minus 0.05em }
@@ -730,7 +738,7 @@
   }{
     \prop_gput:Nnn \g_pecha_seen_prop {#1} {1}
     \prop_gput:Nnn \g_pecha_gloss_prop {#1} {#2}
-    \seq_gput_right:Nn \g_pecha_gloss_order_seq { {#1}{#2} }
+    \seq_gput_right:Nn \g_pecha_gloss_order_seq { {#1}{#2}{#3} }
     \group_begin:
       \begin{tabular}[t]{@{}c@{}}
         \pechaglossfont \pechaglosscolor #2 \\[0.5pt]
@@ -742,26 +750,40 @@
   }
 }
 
-\cs_new_protected:Npn \pecha_gloss_silent:nn #1#2 {
+\cs_new_protected:Npn \pecha_gloss_silent:nnn #1#2#3 {
   \prop_gput:Nnn \g_pecha_gloss_prop {#1} {#2}
-  \seq_if_in:NnF \g_pecha_gloss_order_seq { {#1}{#2} } {
-    \seq_gput_right:Nn \g_pecha_gloss_order_seq { {#1}{#2} }
+  \seq_gput_right:Nn \g_pecha_gloss_order_seq { {#1}{#2}{#3} }
+}
+
+\NewDocumentCommand{\pg}{s m m +o}{
+  \IfBooleanTF{#1} {
+    \IfNoValueTF{#4} {
+      \pecha_gloss_silent:nnn {#2}{#3}{}
+    }{
+      \pecha_gloss_silent:nnn {#2}{#3}{#4}
+    }
+  } {
+    \IfNoValueTF{#4} {
+      \pecha_gloss_render:nnn {#2}{#3}{}
+    }{
+      \pecha_gloss_render:nnn {#2}{#3}{#4}
+    }
   }
 }
 
-\NewDocumentCommand{\pg}{s m m}{
+\NewDocumentCommand{\pechagloss}{s m m +o}{
   \IfBooleanTF{#1} {
-    \pecha_gloss_silent:nn {#2}{#3}
+    \IfNoValueTF{#4} {
+      \pecha_gloss_silent:nnn {#2}{#3}{}
+    }{
+      \pecha_gloss_silent:nnn {#2}{#3}{#4}
+    }
   } {
-    \pecha_gloss_render:nn {#2}{#3}
-  }
-}
-
-\NewDocumentCommand{\pechagloss}{s m m}{
-  \IfBooleanTF{#1} {
-    \pecha_gloss_silent:nn {#2}{#3}
-  } {
-    \pecha_gloss_render:nn {#2}{#3}
+    \IfNoValueTF{#4} {
+      \pecha_gloss_render:nnn {#2}{#3}{}
+    }{
+      \pecha_gloss_render:nnn {#2}{#3}{#4}
+    }
   }
 }
 
@@ -787,7 +809,7 @@
   \raggedright
   \sloppy
   \parindent=0pt
-  { \pechatibfont #1 }%
+  { \pechatibfont \pechatextsize #1 }%
   \par
 }
 
@@ -796,21 +818,26 @@
 \newlength{\pechaglossarycolsep}
 \setlength{\pechaglossarycolsep}{2em}
 
-\cs_new_protected:Npn \pecha_print_glossary_entry:nn #1#2 {
+\cs_new_protected:Npn \pecha_print_glossary_entry:nnn #1#2#3 {
   \hbox{
     \hbox_to_wd:nn { 0.28\textwidth } { \raggedleft { \pechatibfont #1 } \hfil }
     \hbox_to_wd:nn { \pechaglossarycolsep } { \hfil }
     \hbox_to_wd:nn { 0.44\textwidth } { #2 \hfil }
   }
+  \tl_if_empty:nF {#3} {
+    \par
+    \hbox{
+      \hbox_to_wd:nn { 0.28\textwidth } { \hfil }
+      \hbox_to_wd:nn { \pechaglossarycolsep } { \hfil }
+      \hbox_to_wd:nn { 0.44\textwidth } { \footnotesize\itshape #3 \hfil }
+    }
+  }
   \par\vskip 2pt
 }
 
 \NewDocumentCommand{\printpechaglossary}{o}{
-  \newsheet
-  \bool_if:NTF \g_pecha_fancyframe_bool {
-    \bool_set_false:N \g_pecha_fancyframe_bool
-    \bool_set_false:N \g_pecha_singleframe_bool
-  }{}
+  \clearpage
+  \bool_set_true:N \g_pecha_noframe_bool
   \par
   \vskip 12pt
   \group_begin:
@@ -821,10 +848,11 @@
     \noindent \textit{No~glossary~entries~defined.}
   }{
     \seq_map_inline:Nn \g_pecha_gloss_order_seq {
-      \pecha_print_glossary_entry:nn ##1
+      \pecha_print_glossary_entry:nnn ##1
     }
   }
   \par
+  \bool_set_false:N \g_pecha_noframe_bool
 }
 
 \newcommand{\pechaglossarytitle}[1]{
@@ -851,6 +879,11 @@
   }{
     \ClassWarning{pecha}{settranslationfont~has~no~effect~in~wylie~mode}
   }
+}
+
+\newcommand{\setpechamargins}[2]{
+  \dim_set:Nn \g_pecha_outermargin_dim {#1}
+  \dim_set:Nn \g_pecha_innermargin_dim {#2}
 }
 
 \bool_if:NT \g_pecha_unicode_bool {
