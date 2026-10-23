@@ -740,10 +740,8 @@
     \prop_gput:Nnn \g_pecha_gloss_prop {#1} {#2}
     \seq_gput_right:Nn \g_pecha_gloss_order_seq { {#1}{#2}{#3} }
     \group_begin:
-      \begin{tabular}[t]{@{}c@{}}
-        \pechaglossfont \pechaglosscolor #2 \\[0.5pt]
-        { \pechatibfont #1 }
-      \end{tabular}
+      \smash{\raisebox{1.4em}{\makebox[0pt][c]{\pechaglossfont\pechaglosscolor#2}}}%
+      {\pechatibfont#1}%
     \group_end:
     \skip_horizontal:n { 0.3em plus 0.1em minus 0.05em }
     \tex_penalty:D 0
@@ -790,7 +788,7 @@
 \newcommand{\pechatrans}[1]{%
   \par\vskip 4pt
   \bgroup
-    \small\itshape
+    \normalfont\small\itshape
     \setlength{\leftskip}{1.5em}
     #1%
   \egroup
