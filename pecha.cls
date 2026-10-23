@@ -158,12 +158,14 @@
 \dim_new:N \g_pecha_textwidth_saved_dim
 \dim_new:N \g_pecha_titlewidth_dim
 \dim_new:N \g_pecha_outermargin_dim
-\dim_new:N \g_pecha_innermargin_dim
+\dim_new:N \g_pecha_innermargin_horiz_dim
+\dim_new:N \g_pecha_innermargin_vert_dim
 
 \dim_set:Nn \g_pecha_marginht_dim {3ex}
 \dim_set:Nn \g_pecha_margindp_dim {1ex}
 \dim_set:Nn \g_pecha_outermargin_dim {8mm}
-\dim_set:Nn \g_pecha_innermargin_dim {3ex}
+\dim_set:Nn \g_pecha_innermargin_horiz_dim {2ex}
+\dim_set:Nn \g_pecha_innermargin_vert_dim  {5ex}
 
 \newcounter{pechasheet}
 \setcounter{pechasheet}{1}
@@ -562,15 +564,15 @@
             \vbox{
               \hbox{
                 \l_pecha_theleft_tl
-                \pecha_doubleruler:\kern \g_pecha_innermargin_dim
+                \pecha_doubleruler:\kern \g_pecha_innermargin_horiz_dim
                 \vbox to \textheight{
                   \vss
-                  \kern \g_pecha_innermargin_dim
+                  \kern \g_pecha_innermargin_vert_dim
                   \box_use:N #1
-                  \kern \g_pecha_innermargin_dim
+                  \kern \g_pecha_innermargin_vert_dim
                   \vss
                 }
-                \pecha_doubleruler:\kern \g_pecha_innermargin_dim
+                \pecha_doubleruler:\kern \g_pecha_innermargin_horiz_dim
                 \l_pecha_theright_tl
               }
             }
@@ -592,9 +594,9 @@
             \vrule\kern 0.5em
             \vbox to \textheight{
               \vss
-              \kern \g_pecha_innermargin_dim
+              \kern \g_pecha_innermargin_vert_dim
               \box_use:N #1
-              \kern \g_pecha_innermargin_dim
+              \kern \g_pecha_innermargin_vert_dim
               \vss
             }
             \vrule
@@ -626,7 +628,7 @@
                   \hrule
                   \hbox{
                     \kern 4em\pecha_doubleruler:\kern 2em\pecha_doubleruler:\kern 0.5em
-                    \vbox to \textheight{ \vss \kern \g_pecha_innermargin_dim \box_use:N #1 \kern \g_pecha_innermargin_dim \vss }
+                    \vbox to \textheight{ \vss \kern \g_pecha_innermargin_vert_dim \box_use:N #1 \kern \g_pecha_innermargin_vert_dim \vss }
                     \pecha_doubleruler:\kern 2em\pecha_doubleruler:\kern 4em
                   }
                   \hrule
@@ -786,13 +788,13 @@
 }
 
 \newcommand{\pechatrans}[1]{%
-  \par\vskip 4pt
+  \par\vskip 2pt
   \bgroup
     \normalfont\small\itshape
     \setlength{\leftskip}{1.5em}
     #1%
   \egroup
-  \par\vskip 8pt
+  \par\vskip 4pt
 }
 
 \NewDocumentEnvironment{pecha}{}{%
@@ -871,9 +873,10 @@
   }
 }
 
-\newcommand{\setpechamargins}[2]{
+\newcommand{\setpechamargins}[3]{
   \dim_set:Nn \g_pecha_outermargin_dim {#1}
-  \dim_set:Nn \g_pecha_innermargin_dim {#2}
+  \dim_set:Nn \g_pecha_innermargin_horiz_dim {#2}
+  \dim_set:Nn \g_pecha_innermargin_vert_dim {#3}
 }
 
 \bool_if:NT \g_pecha_unicode_bool {
