@@ -164,7 +164,7 @@
 \dim_set:Nn \g_pecha_marginht_dim {3ex}
 \dim_set:Nn \g_pecha_margindp_dim {1ex}
 \dim_set:Nn \g_pecha_outermargin_dim {8mm}
-\dim_set:Nn \g_pecha_innermargin_horiz_dim {2ex}
+\dim_set:Nn \g_pecha_innermargin_horiz_dim {4ex}
 \dim_set:Nn \g_pecha_innermargin_vert_dim  {25pt}
 
 \newcounter{pechasheet}
@@ -742,22 +742,17 @@
 
 \cs_new_protected:Npn \pecha_gloss_render:nnn #1#2#3 {
   \prop_if_in:NnTF \g_pecha_seen_prop {#1} {
-    \vbox{
-      \hbox to 0pt{\hss\vrule height 7pt depth 0pt width 0pt\hss}
-      \kern 1pt
-      \hbox{\pechatibfont#1}
-    }
+    { \pechatibfont #1 }
     \skip_horizontal:n { 0.3em plus 0.1em minus 0.05em }
     \tex_penalty:D 0
   }{
     \prop_gput:Nnn \g_pecha_seen_prop {#1} {1}
     \prop_gput:Nnn \g_pecha_gloss_prop {#1} {#2}
     \seq_gput_right:Nn \g_pecha_gloss_order_seq { {#1}{#2}{#3} }
-    \vbox{
-      \hbox to 0pt{\hss\pechaglossfont\pechaglosscolor#2\hss}
-      \kern 1pt
-      \hbox{\pechatibfont#1}
-    }
+    \group_begin:
+      \smash{\raisebox{1.2em}{\makebox[0pt][c]{\pechaglossfont\pechaglosscolor#2}}}%
+      {\pechatibfont#1}%
+    \group_end:
     \skip_horizontal:n { 0.3em plus 0.1em minus 0.05em }
     \tex_penalty:D 0
   }
