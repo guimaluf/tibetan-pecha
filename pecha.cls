@@ -165,7 +165,7 @@
 \dim_set:Nn \g_pecha_margindp_dim {1ex}
 \dim_set:Nn \g_pecha_outermargin_dim {8mm}
 \dim_set:Nn \g_pecha_innermargin_horiz_dim {2ex}
-\dim_set:Nn \g_pecha_innermargin_vert_dim  {5ex}
+\dim_set:Nn \g_pecha_innermargin_vert_dim  {25pt}
 
 \newcounter{pechasheet}
 \setcounter{pechasheet}{1}
@@ -565,12 +565,14 @@
               \hbox{
                 \l_pecha_theleft_tl
                 \pecha_doubleruler:\kern \g_pecha_innermargin_horiz_dim
-                \vbox to \textheight{
-                  \vss
+                \vbox{
                   \kern \g_pecha_innermargin_vert_dim
-                  \box_use:N #1
+                  \vbox to \textheight{
+                    \vss
+                    \box_use:N #1
+                    \vss
+                  }
                   \kern \g_pecha_innermargin_vert_dim
-                  \vss
                 }
                 \pecha_doubleruler:\kern \g_pecha_innermargin_horiz_dim
                 \l_pecha_theright_tl
@@ -592,12 +594,14 @@
           \hbox{
             \l_pecha_theleft_tl
             \vrule\kern 0.5em
-            \vbox to \textheight{
-              \vss
+            \vbox{
               \kern \g_pecha_innermargin_vert_dim
-              \box_use:N #1
+              \vbox to \textheight{
+                \vss
+                \box_use:N #1
+                \vss
+              }
               \kern \g_pecha_innermargin_vert_dim
-              \vss
             }
             \vrule
             \l_pecha_theright_tl
@@ -628,7 +632,11 @@
                   \hrule
                   \hbox{
                     \kern 4em\pecha_doubleruler:\kern 2em\pecha_doubleruler:\kern 0.5em
-                    \vbox to \textheight{ \vss \kern \g_pecha_innermargin_vert_dim \box_use:N #1 \kern \g_pecha_innermargin_vert_dim \vss }
+                    \vbox{
+                      \kern \g_pecha_innermargin_vert_dim
+                      \vbox to \textheight{ \vss \box_use:N #1 \vss }
+                      \kern \g_pecha_innermargin_vert_dim
+                    }
                     \pecha_doubleruler:\kern 2em\pecha_doubleruler:\kern 4em
                   }
                   \hrule
@@ -742,7 +750,7 @@
     \prop_gput:Nnn \g_pecha_gloss_prop {#1} {#2}
     \seq_gput_right:Nn \g_pecha_gloss_order_seq { {#1}{#2}{#3} }
     \group_begin:
-      \smash{\raisebox{1.4em}{\makebox[0pt][c]{\pechaglossfont\pechaglosscolor#2}}}%
+      \smash{\raisebox{1.2em}{\makebox[0pt][c]{\pechaglossfont\pechaglosscolor#2}}}%
       {\pechatibfont#1}%
     \group_end:
     \skip_horizontal:n { 0.3em plus 0.1em minus 0.05em }
@@ -790,15 +798,17 @@
 \newcommand{\pechatrans}[1]{%
   \par\vskip 2pt
   \bgroup
+    \parskip=0pt
     \normalfont\small\itshape
     \setlength{\leftskip}{1.5em}
     #1%
   \egroup
-  \par\vskip 4pt
+  \par\vskip 2pt
 }
 
 \NewDocumentEnvironment{pecha}{}{%
   \par \raggedright \sloppy \parindent=0pt
+  \parskip=4pt
   \hfuzz=0.5em
   \pechatibfont \pechatextsize
 }{%
