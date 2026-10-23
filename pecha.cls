@@ -750,7 +750,7 @@
     \prop_gput:Nnn \g_pecha_gloss_prop {#1} {#2}
     \seq_gput_right:Nn \g_pecha_gloss_order_seq { {#1}{#2}{#3} }
     \group_begin:
-      \smash{\raisebox{1.2em}{\makebox[0pt][c]{\pechaglossfont\pechaglosscolor#2}}}%
+      \smash{\raisebox{1.2em}{\kern 0.3em\makebox[0pt][c]{\pechaglossfont\pechaglosscolor#2}}}%
       {\pechatibfont#1}%
     \group_end:
     \skip_horizontal:n { 0.3em plus 0.1em minus 0.05em }
