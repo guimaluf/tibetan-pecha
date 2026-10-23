@@ -34,16 +34,17 @@ Install on Ubuntu:
 \documentclass{pecha}
 \setpechafont{Noto Serif Tibetan}
 
-\title{Example Pecha}
-\oddleft{T}{E}
+\shorttitle{དཔེ་ཆ}{pecha}
+\translatedtitle{Example}
+\title{དཔེ་ཆ་དཔེར་བརྗོད།}
 
 \begin{document}
 \maketitle
 
-\pecha{
+\begin{pecha}
   \pg{དཔེ་ཆ}{pecha} \pg{ནི}{is} \pg{བོད་ཀྱི}{Tibetan}
-}
-\pechatrans{The pecha is the traditional Tibetan book format.}
+  \pechatrans{The pecha is the traditional Tibetan book format.}
+\end{pecha}
 
 \printpechaglossary
 \end{document}
@@ -57,15 +58,17 @@ Install on Ubuntu:
 
 | Command | Description |
 |---------|-------------|
-| `\pg{word}{gloss}` | Gloss a Tibetan word (shown only on first occurrence) |
-| `\pg*{word}{gloss}` | Silent gloss: glossary only, no in-text display |
-| `\pecha{...}` | Tibetan text paragraph |
-| `\pechatrans{...}` | Translation paragraph |
+| `\pg{word}{gloss}[note]` | Gloss a Tibetan word (shown only on first occurrence; note appears in glossary only) |
+| `\pg*{word}{gloss}[note]` | Silent gloss: glossary only, no in-text display |
+| `\pecha{...}` or `\begin{pecha}...\end{pecha}` | Tibetan text (command for single block, environment for multi-page flow) |
+| `\pechatrans{...}` | Translation paragraph (can be used inside `pecha` environment) |
 | `\printpechaglossary` | Print glossary at end of document |
 | `\pechaglossreset` | Reset gloss tracking (new chapter/section) |
 | `\pechaglossresetall` | Reset all gloss tracking and glossary entries |
 | `\setpechafont{font}` | Set the Tibetan font |
+| `\setpechamargins{outer}{inner-h}{inner-v}` | Set margins: outer (paper edge), inner horizontal (left/right), inner vertical (top/bottom) |
 | `\settranslationfont{font}` | Set a dedicated font for translations |
+| `\setpechatextsize{\size}` | Set Tibetan text size (default `\large`) |
 | `\oddleft{a}{b}` | Left margin text on odd pages |
 | `\oddright{text}` | Right margin text on odd pages |
 | `\evenleft{text}` | Left margin text on even pages |
