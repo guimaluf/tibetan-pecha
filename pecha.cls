@@ -1,740 +1,869 @@
-%\iffalse (Meta-Kommentar)
-% Eine Klasse zur Erstellung von Tibetischen Texten mit \TibTeX
-% \fi
-% \title{Eine \LaTeX2e~Klasse zur Erstellung tibetischer Texte mit \TibTeX}
-% \author{Dieter Jäger}
-% Version 0.1 - 10.11.2004
-% Copyright 2004 by Dieter Jäger
-% License: GPL
-
-\ProvidesClass{pecha}[2004/11/10 v0.1 Tibetan Pecha document class]
+\ProvidesExplClass{pecha}{2025/10/23}{v1.0}{Tibetan~Pecha~document~class~with~translation~glossing}
 \NeedsTeXFormat{LaTeX2e}
-% Tibetan language package
-\RequirePackage{ctib}
 
-% This is needed to be able to do the margin texts
-\RequirePackage{rotating}
+\LoadClass{article}
 
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
 
-% Set page dimensons
-% All the page sizes from the standard classes
-% But a5 or b5 may not be very usefull
+\bool_new:N \g_pecha_unicode_bool
+\bool_new:N \g_pecha_wylie_bool
+\bool_new:N \g_pecha_rotate_bool
+\bool_new:N \g_pecha_singleframe_bool
+\bool_new:N \g_pecha_fancyframe_bool
+\bool_new:N \g_pecha_septitle_bool
+\bool_new:N \g_pecha_has_title_bool
 
-\DeclareOption{a4pecha3}
-   {\setlength\paperwidth {297mm}
-    \setlength\paperheight {70mm}}
-\DeclareOption{a4pecha2}
-   {\setlength\paperwidth {297mm}
-    \setlength\paperheight {140mm}}
-\DeclareOption{a4paper}
-   {\setlength\paperwidth {297mm}%
-    \setlength\paperheight  {210mm}}
-\DeclareOption{a5pecha3}
-   {\setlength\paperwidth {210mm}%
-    \setlength\paperheight  {47mm}}
-\DeclareOption{a5pecha2}
-   {\setlength\paperwidth {210mm}%
-    \setlength\paperheight  {74mm}}
-\DeclareOption{a5paper}
-   {\setlength\paperwidth {210mm}%
-    \setlength\paperheight  {148mm}}
-\DeclareOption{b5pecha3}
-   {\setlength\paperwidth {250mm}%
-    \setlength\paperheight  {49.3mm}}
-\DeclareOption{b5pecha2}
-   {\setlength\paperwidth {250mm}%
-    \setlength\paperheight  {74mm}}
-\DeclareOption{b5pecha3}
-   {\setlength\paperwidth {250mm}%
-    \setlength\paperheight  {58.67mm}}
-\DeclareOption{b5pecha2}
-   {\setlength\paperwidth {250mm}%
-    \setlength\paperheight  {88mm}}
-\DeclareOption{b5paper}
-   {\setlength\paperwidth {250mm}%
-    \setlength\paperheight  {176mm}}
-\DeclareOption{letterpecha3}
-   {\setlength\paperwidth {11in}%
-    \setlength\paperheight  {2.83in}}
-\DeclareOption{letterpecha2}
-   {\setlength\paperwidth {11in}%
-    \setlength\paperheight  {4.25in}}
-\DeclareOption{letterpaper}
-   {\setlength\paperwidth {11in}%
-    \setlength\paperheight  {8.5in}}
-\DeclareOption{legalpecha3}
-   {\setlength\paperwidth {14in}%
-    \setlength\paperheight  {2.83in}}
-\DeclareOption{legalpecha2}
-   {\setlength\paperwidth {14in}%
-    \setlength\paperheight  {4.25in}}
-\DeclareOption{legalpaper}
-   {\setlength\paperwidth {14in}%
-    \setlength\paperheight  {8.5in}}
-\DeclareOption{executivepaper}
-   {\setlength\paperwidth {10.5in}%
-    \setlength\paperheight  {2.42in}}
-\DeclareOption{executivepaper}
-   {\setlength\paperwidth {10.5in}%
-    \setlength\paperheight  {3.625in}}
-\DeclareOption{executivepaper}
-   {\setlength\paperwidth {10.5in}%
-    \setlength\paperheight  {7.25in}}
+\bool_set_true:N \g_pecha_unicode_bool
+\bool_set_false:N \g_pecha_wylie_bool
+\bool_set_false:N \g_pecha_rotate_bool
+\bool_set_false:N \g_pecha_singleframe_bool
+\bool_set_false:N \g_pecha_fancyframe_bool
+\bool_set_false:N \g_pecha_septitle_bool
+\bool_set_false:N \g_pecha_has_title_bool
 
-% This is from the book class
-% May be changed in future ...
-\newcommand\@ptsize{0}
-\DeclareOption{8pt}{\renewcommand\@ptsize{8}}
-\DeclareOption{9pt}{\renewcommand\@ptsize{9}}
-\DeclareOption{10pt}{\renewcommand\@ptsize{0}}
-\DeclareOption{11pt}{\renewcommand\@ptsize{1}}
-\DeclareOption{12pt}{\renewcommand\@ptsize{2}}
-
-\@lowpenalty   51
-\@medpenalty  151
-\@highpenalty 301
-
-%\DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
-%\DeclareOldFontCommand{\sf}{\normalfont\sffamily}{\mathsf}
-%\DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
-%\DeclareOldFontCommand{\bf}{\normalfont\bfseries}{\mathbf}
-%\DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
-%\DeclareOldFontCommand{\sl}{\normalfont\slshape}{\@nomath\sl}
-%\DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
-%\DeclareRobustCommand*\cal{\@fontswitch\relax\mathcal}
-%\DeclareRobustCommand*\mit{\@fontswitch\relax\mathnormal}
-
-
-% option "rotate", standard: do not do that
-% If set the class will rotate the even pages by 180 degrees
-\newif\if@pecharotate
-\@pecharotatefalse
-
-% standard page frame, using double lines
-\def\@pageframe#1{\@doubleframe{#1}}
-\newif\if@fsingle
-\@fsinglefalse
-\newif\if@ffancy
-\@ffancyfalse
-
-\newlength\@rulers
-
-\DeclareOption{rotate}{\@pecharotatetrue}
-\DeclareOption{fancyframe}{
-  \global\@fsingletrue\global\@ffancytrue
-  \global\def\@pageframe#1{\@fancyframe{#1}}
+\DeclareOption{wylie}{
+  \bool_set_true:N \g_pecha_wylie_bool
+  \bool_set_false:N \g_pecha_unicode_bool
 }
-\DeclareOption{doubleframe}{\@fsinglefalse \global\@rulers=9.2pt \global\def\@pageframe#1{\@doubleframe{#1}}}
-\DeclareOption{simplefram}{\global\@rulers=1.6pt \global\def\@pageframe#1{\@fsingletrue \@singleframe{#1}}}
 
-% The pageheight can be adjusted a little bit
-\newlength\pecha@pheight
-\DeclareOption{narrowpage}{\setlength\pecha@pheight{26ex}}
-\DeclareOption{mediumpage}{\setlength\pecha@pheight{28ex}}
-\DeclareOption{widepage}{\setlength\pecha@pheight{33ex}}
-\DeclareOption{extrawide}{\setlength\pecha@pheight{36ex}}
+\DeclareOption{a4pecha3}{
+  \dim_set:Nn \paperwidth {297mm}
+  \dim_set:Nn \paperheight {70mm}
+}
+\DeclareOption{a4pecha2}{
+  \dim_set:Nn \paperwidth {297mm}
+  \dim_set:Nn \paperheight {140mm}
+}
+\DeclareOption{a4paper}{
+  \dim_set:Nn \paperwidth {297mm}
+  \dim_set:Nn \paperheight {210mm}
+}
+\DeclareOption{a5pecha3}{
+  \dim_set:Nn \paperwidth {210mm}
+  \dim_set:Nn \paperheight {47mm}
+}
+\DeclareOption{a5pecha2}{
+  \dim_set:Nn \paperwidth {210mm}
+  \dim_set:Nn \paperheight {74mm}
+}
+\DeclareOption{a5paper}{
+  \dim_set:Nn \paperwidth {210mm}
+  \dim_set:Nn \paperheight {148mm}
+}
+\DeclareOption{b5pecha3}{
+  \dim_set:Nn \paperwidth {250mm}
+  \dim_set:Nn \paperheight {58.67mm}
+}
+\DeclareOption{b5pecha2}{
+  \dim_set:Nn \paperwidth {250mm}
+  \dim_set:Nn \paperheight {88mm}
+}
+\DeclareOption{b5paper}{
+  \dim_set:Nn \paperwidth {250mm}
+  \dim_set:Nn \paperheight {176mm}
+}
+\DeclareOption{letterpecha3}{
+  \dim_set:Nn \paperwidth {11in}
+  \dim_set:Nn \paperheight {2.83in}
+}
+\DeclareOption{letterpecha2}{
+  \dim_set:Nn \paperwidth {11in}
+  \dim_set:Nn \paperheight {4.25in}
+}
+\DeclareOption{letterpaper}{
+  \dim_set:Nn \paperwidth {11in}
+  \dim_set:Nn \paperheight {8.5in}
+}
+\DeclareOption{legalpecha3}{
+  \dim_set:Nn \paperwidth {14in}
+  \dim_set:Nn \paperheight {2.83in}
+}
+\DeclareOption{legalpecha2}{
+  \dim_set:Nn \paperwidth {14in}
+  \dim_set:Nn \paperheight {4.25in}
+}
+\DeclareOption{legalpaper}{
+  \dim_set:Nn \paperwidth {14in}
+  \dim_set:Nn \paperheight {8.5in}
+}
+\DeclareOption{executivepaper}{
+  \dim_set:Nn \paperwidth {10.5in}
+  \dim_set:Nn \paperheight {7.25in}
+}
 
-\newif\if@septitle
-\@septitlefalse
-\DeclareOption{septitle}{\global\@septitletrue}
+\DeclareOption{rotate}{\bool_set_true:N \g_pecha_rotate_bool}
+\DeclareOption{fancyframe}{
+  \bool_set_true:N \g_pecha_singleframe_bool
+  \bool_set_true:N \g_pecha_fancyframe_bool
+}
+\DeclareOption{doubleframe}{
+  \bool_set_false:N \g_pecha_singleframe_bool
+}
+\DeclareOption{simpleframe}{
+  \bool_set_true:N \g_pecha_singleframe_bool
+}
+\DeclareOption{septitle}{\bool_set_true:N \g_pecha_septitle_bool}
 
-\ExecuteOptions{doubleframe,letterpaper,10pt,mediumpage}
+\dim_new:N \g_pecha_pheight_dim
+\DeclareOption{narrowpage}{\dim_set:Nn \g_pecha_pheight_dim {26ex}}
+\DeclareOption{mediumpage}{\dim_set:Nn \g_pecha_pheight_dim {28ex}}
+\DeclareOption{widepage}{\dim_set:Nn \g_pecha_pheight_dim {33ex}}
+\DeclareOption{extrawide}{\dim_set:Nn \g_pecha_pheight_dim {36ex}}
+
+\dim_new:N \g_pecha_rulers_dim
+
+\ExecuteOptions{a4pecha2,doubleframe,10pt,mediumpage}
 \ProcessOptions
 
+\bool_if:NTF \g_pecha_singleframe_bool
+  { \dim_set:Nn \g_pecha_rulers_dim {1.6pt} }
+  { \dim_set:Nn \g_pecha_rulers_dim {9.2pt} }
 
-\renewcommand{\baselinestretch}{0.7}
-\ifnum\@ptsize < 3
-   \input{bk1\@ptsize.clo}
-   \setlength\lineskip{1\p@}
-   \setlength\normallineskip{1\p@}
-%   \renewcommand\baselinestretch{}
-   \setlength\parskip{0\p@ \@plus \p@}
-\else
-   \input{size\@ptsize.clo}
-   \setlength\lineskip{\p@}
-   \setlength\normallineskip{\p@}
-%   \renewcommand\baselinestretch{}
-   \setlength\parskip{\p@}
-\fi
+\sys_if_engine_xetex:T { \bool_set_true:N \g_pecha_unicode_bool }
+\sys_if_engine_luatex:T { \bool_set_true:N \g_pecha_unicode_bool }
+\sys_if_engine_pdftex:T {
+  \bool_if:NT \g_pecha_unicode_bool {
+    \ClassWarning{pecha}{PDFTeX~detected.~Use~XeLaTeX~or~LuaLaTeX~for~Unicode~Tibetan.~Forcing~wylie~mode.}
+    \bool_set_false:N \g_pecha_unicode_bool
+    \bool_set_true:N \g_pecha_wylie_bool
+  }
+}
 
+\bool_if:NTF \g_pecha_unicode_bool {
+  \RequirePackage{fontspec}
+}{
+  \bool_if:NT \g_pecha_wylie_bool {
+    \IfFileExists{ctib.sty}{
+      \RequirePackage{ctib}
+    }{
+      \ClassError{pecha}{ctib~package~not~found.~Install~texlive-lang-other}{}
+    }
+  }
+}
 
-\ifx\pdftexversion\undefined
-  \special{papersize=\the\paperwidth,\the\paperheight}
-  \special{! /landplus90 true store}
-\else
-  \setlength\pdfpagewidth{\paperwidth}
-  \setlength\pdfpageheight{\paperheight}
-  \RequirePackage{times}
-\fi
+\dim_new:N \g_pecha_margin_dim
+\dim_new:N \g_pecha_marginht_dim
+\dim_new:N \g_pecha_margindp_dim
+\dim_new:N \g_pecha_pechadim_dim
+\dim_new:N \g_pecha_titledim_dim
+\dim_new:N \g_pecha_pechawidth_dim
+\dim_new:N \g_pecha_textwidth_saved_dim
+\dim_new:N \g_pecha_titlewidth_dim
 
-\setlength{\textheight}{\pecha@pheight}
-
-\newlength{\@marginht}
-\newlength{\@margindp}
-\newlength{\@marginsep}
-
-\newlength{\@pechadim}
-\newlength{\@titledim}
-\newlength{\@pechawidth}
-\newlength{\@@textwidth} % speichert Textbreit für fancy
-\newlength{\@titlewidth}
-\newlength{\pechamargin}
-\setlength{\pechamargin}{0.6in}
+\dim_set:Nn \g_pecha_margin_dim {0.6in}
+\dim_set:Nn \g_pecha_marginht_dim {3ex}
+\dim_set:Nn \g_pecha_margindp_dim {1ex}
 
 \newcounter{pechasheet}
-\setcounter{pechasheet}{\@ne}
-\@marginht 3ex
-\@margindp 1ex
+\setcounter{pechasheet}{1}
 
-\@pechadim 6em % Abstand zu den Rändern
-\advance\@pechadim by \@rulers % Summe der dicke aller vertikalen Linien
-\advance\@pechadim by 2\@marginht % Höhe der Randboxen
-\advance\@pechadim by 2\@margindp % Tiefe der Randboxen
+\dim_gset:Nn \g_pecha_pechadim_dim {6em}
+\dim_gadd:Nn \g_pecha_pechadim_dim { \g_pecha_rulers_dim }
+\dim_gadd:Nn \g_pecha_pechadim_dim { 2\g_pecha_marginht_dim }
+\dim_gadd:Nn \g_pecha_pechadim_dim { 2\g_pecha_margindp_dim }
 
-\textwidth\paperwidth
-\advance\textwidth by - 2\pechamargin % Abstand zu Papierrand, 0.6in beidseitig
-\@pechawidth\textwidth
-\@titledim 0.2\textwidth
-\advance\textwidth by - \@pechadim
+\dim_set:Nn \textwidth { \paperwidth - 2\g_pecha_margin_dim }
+\dim_gset_eq:NN \g_pecha_pechawidth_dim \textwidth
+\dim_gset:Nn \g_pecha_titledim_dim { 0.2\textwidth }
 
-\@titlewidth\textwidth
-\advance\@titlewidth by - \@titledim
+\dim_gsub:Nn \textwidth { \g_pecha_pechadim_dim }
+\dim_gset_eq:NN \g_pecha_textwidth_saved_dim \textwidth
 
-\@@textwidth=\textwidth
-\if@ffancy
-  \advance\textwidth by - 12em % fancy Rahmen haben breite Ränder
-\fi
+\bool_if:NT \g_pecha_fancyframe_bool {
+  \dim_gsub:Nn \textwidth { 12em }
+}
 
-\headheight 0pt
-\headsep 0pt
-\marginparsep 0pt
-\marginparwidth 0pt
-\footskip 0pt
-\marginparpush 0pt
+\dim_gset:Nn \g_pecha_titlewidth_dim { \textwidth - \g_pecha_titledim_dim }
 
-\topmargin \paperheight
-\advance\topmargin by - \textheight
-\advance\topmargin by -0.5 \topmargin
-\advance\topmargin by - 1.1in
-%\advance\topmargin by - 1.2in
+\dim_set_eq:NN \textheight \g_pecha_pheight_dim
 
-\oddsidemargin \paperwidth
-\advance \oddsidemargin by - \@pechawidth
-\advance \oddsidemargin by - 0.5 \oddsidemargin
-%\advance \oddsidemargin by - 1in
-\advance \oddsidemargin by - 1.5\pechamargin
-\evensidemargin \oddsidemargin
+\setlength{\headheight}{0pt}
+\setlength{\headsep}{0pt}
+\setlength{\marginparsep}{0pt}
+\setlength{\marginparwidth}{0pt}
+\setlength{\footskip}{0pt}
+\setlength{\marginparpush}{0pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{12pt}
+
+\dim_set:Nn \topmargin { \paperheight - \textheight }
+\dim_set:Nn \topmargin { 0.5 \topmargin - 1.1in }
+
+\dim_set:Nn \oddsidemargin { \paperwidth - \g_pecha_pechawidth_dim }
+\dim_set:Nn \oddsidemargin { 0.5 \oddsidemargin - 1.5\g_pecha_margin_dim }
+\dim_set_eq:NN \evensidemargin \oddsidemargin
 
 \pagenumbering{arabic}
-\sloppy
-%\raggedright
-\parindent=0pt
-\parskip12pt
 
-% Some dimensons I will need
-
-\newbox\@pbox
-\newbox\@obox
-
-
-
-% Some usefull and simple macros
-\newcommand{\tibsmall}[1]{{\footnotesize \begin{tib} #1\end{tib}}}
-
-
-% Translate numerals from 1 to 99 into words
-% numeraly >=100 stay as is 
-\def\tibnumeral#1{
-\ifnum #1<100
-  \ifcase #1
-  % 1-10
-    \or gcig \or gnyis \or gsum \or bzhi \or lnga
-    \or drug \or bdun  \or b-rgyad \or dgu
-    \or bcu
-  % 11-20
-    \or {bcu gcig} \or {bcu gnyis} \or {bcu gsum} \or {bcu bzhi} \or {bco lnga}
-    \or {bcu drug} \or {bcu bdun} \or {bco b-rgyad} \or {bcu dgu} \or {nyi zhu}
-  % 21 - 30
-    \or {nyi zhu tsa gcig} \or {nyi zhu tsa gnyis} \or {nyi zhu tsa gsum}
-    \or {nyi zhu tsa bzhi} \or {nyi zhu tse lnga} \or {nyi zhu tsa drug}
-    \or {nyi zhu tsa bdun} \or {nyi zhu tsa b-rgyad} \or {nyi zhu tsa dgu}
-    \or {gsum bcu}
-  % 31 - 40
-    \or {gsum bcu so gcig} \or {gsum bcu so gnyis} \or {gsum bcu so gsum}
-    \or {gsum bcu so bzhi} \or {gsum bcu so lnga} \or {gsum bcu so drug}
-    \or {gsum bcu so bdun} \or {gsum bcu so b-rgyad} \or {gsum bcu so dgu}
-    \or {bzhi bcu}
-  % 41 - 50
-    \or {bzhi bcu zhe gcig} \or {bzhi bcu zhe gnyis} \or {bzhi bcu zhe gsum}
-    \or {bzhi bcu zhe bzhi} \or {bzhi bcu zhe lnga} \or {bzhi bcu zhe drug}
-    \or {bzhi bcu zhe bdun} \or {bzhi bcu zhe b-rgyad} \or {bzhi bcu zhe dgu}
-    \or {lnga bcu}
-  % 51 - 60
-    \or {lnga bcu nga gcig} \or {lnga bcu nga gnyis} \or {lnga bcu nga gsum}
-    \or {lnga bcu nga bzhi} \or {lnga bcu nge lnga} \or {lnga bcu nga drug}
-    \or {lnga bcu nga bdun} \or {lnga bcu nga b-rgyad} \or {lnga bcu nga dgu}
-    \or {drug bcu}
-  % 61 - 70
-    \or {drug bcu re gcig} \or {drug bcu re gnyis} \or {drug bcu re gsum}
-    \or {drug bcu re bzhi} \or {drug bcu re lnga} \or {drug bcu re drug}
-    \or {drug bcu re bdun} \or {drug bcu re b-rgyad} \or {drug bcu re dgu}
-    \or {bdun bcu}
-  % 71 - 80
-    \or {bdun bcu don gcig} \or {bdun bcu don gnyis} \or {bdun bcu don gsum}
-    \or {bdun bcu don bzhi} \or {bdun bcu don lnga} \or {bdun bcu don drug}
-    \or {bdun bcu don bdun} \or {bdun bcu don b-rgyad} \or {bdun bcu don dgu}
-    \or {b-rgyad bcu}
-  % 81 -90
-    \or {b-rgyad bcu rgya gcig} \or {b-rgyad bcu rgya gnyis}
-    \or {b-rgyad bcu rgya gsum}
-    \or {b-rgyad bcu rgya bzhi} \or {b-rgyad bcu rgya lnga}
-    \or {b-rgyad bcu rgya drug}
-    \or {b-rgyad bcu rgya bdun} \or {b-rgyad bcu rgya b-rgyad}
-    \or {b-rgyad bcu rgya dgu}
-    \or {dgu bcu}
-  % 91 - 99
-    \or {dgu bcu go gcig} \or {dgu bcu go gnyis} \or {dgu bcu go gsum}
-    \or {dgu bcu go bzhi} \or {dgu bcu go lnga} \or {dgu bcu go drug}
-    \or {dgu bcu go bdun} \or {dgu bcu go b-rgyad} \or {dgu bcu go dgu}
-  \fi
-\else
-  #1
-\fi
+\sys_if_engine_pdftex:T {
+  \dim_set_eq:NN \pdfpagewidth \paperwidth
+  \dim_set_eq:NN \pdfpageheight \paperheight
+}
+\sys_if_engine_xetex:T {
+  \dim_set_eq:NN \pdfpagewidth \paperwidth
+  \dim_set_eq:NN \pdfpageheight \paperheight
+}
+\sys_if_engine_luatex:T {
+  \dim_set_eq:NN \pdfpagewidth \paperwidth
+  \dim_set_eq:NN \pdfpageheight \paperheight
 }
 
-% Makros to create the right and left margin texts
+\pagestyle{empty}
 
-\def\@oleft{}
-\def\@@oleft{}
-\def\@eleft{}
-\def\@eright{}
-\def\@oright{}
-\def\@oddright{}
-\def\@evenright{}
-\def\@evenleft{}
-\def\@oddleft{}
-\def\@theleft{}
-\def\@theright{}
+\renewcommand{\baselinestretch}{0.7}
+\raggedbottom
 
-\newcommand{\oddleft}[2]{\global\def\@oleft{#1}\global\def\@@oleft{#2}}
-\newcommand{\oddright}[1]{\global\def\@oright{#1}}
-\newcommand{\evenleft}[1]{\global\def\@eleft{#1}}
-\newcommand{\evenright}[1]{\global\def\@eright{#1}}
+\tl_new:N \g_pecha_oleft_tl
+\tl_new:N \g_pecha_oleft_alt_tl
+\tl_new:N \g_pecha_eleft_tl
+\tl_new:N \g_pecha_eright_tl
+\tl_new:N \g_pecha_oright_tl
 
-
-% Print a title page (default: none)
-\newif\if@pechatitle
-\@pechatitlefalse
-
-
-% Title page (similar to book.cls)
-\def\title#1{\gdef\@title{#1}}
-\def\@title{\@latex@error{No \noexpand\title given}\@ehc}
-
-% vertical double line
-\def\@doubleruler{\vrule\kern1.5pt\vrule}
-
-
-% ignore standard chapter marks
-\newcommand{\paragraph}[1]{}
-\newcommand{\subparagraph}[1]{}
-\newcommand{\section}[1]{\medskip}
-\newcommand{\subsection}[1]{}
-\newcommand{\subsubsection}[1]{}
-\newcommand{\chapter}[1]{\bigskip}
-\newcommand{\part}[1]{\bigskip}
-
-\newcommand{\newsheet}{\clearpage\ifodd\c@page\else
-    \hbox{}\newpage\fi}
-
-% Titlepage environment
-\newenvironment{titlepage}{%
-  \newsheet
-  \setcounter{page}\@ne
-}%
-{%
-  \if@septitle 
-    \newsheet
-    \setcounter{page}\@ne
-    \setcounter{pechasheet}{\@ne}
-  \else
-    \newpage
-  \fi
+\newcommand{\oddleft}[2]{
+  \tl_gset:Nn \g_pecha_oleft_tl {#1}
+  \tl_gset:Nn \g_pecha_oleft_alt_tl {#2}
+}
+\newcommand{\oddright}[1]{
+  \tl_gset:Nn \g_pecha_oright_tl {#1}
+}
+\newcommand{\evenleft}[1]{
+  \tl_gset:Nn \g_pecha_eleft_tl {#1}
+}
+\newcommand{\evenright}[1]{
+  \tl_gset:Nn \g_pecha_eright_tl {#1}
 }
 
-% Print a title page with the typical frame
-\newcommand{\maketitle}
-{
-  \global\@pechatitletrue
-  \setbox\@pbox\hbox{\parbox{\@titlewidth}{\begin{center}\@title\par\end{center}}}
-  % Beautify short titles
-  %\ifdim\ht\@pbox < 2.5ex \ht\@pbox=2.5ex \dp\@pbox=1.25ex\fi
-  % Calculate offsets to center the title page
-  \setlength\@tempdima{\textwidth}
-  \advance\@tempdima by - 12pt
-  \advance\@tempdima by - 10em
-  \advance\@tempdima by - \wd\@pbox
-  \advance\@tempdima by - 0.5\@tempdima
-  \ifdim\@tempdima < 0em \setlength\@tempdima{0em}\fi
-  \setlength\@tempdimb{\textheight}
-  \advance\@tempdimb - 4pt
-  \advance\@tempdimb - 5em
-  \advance\@tempdimb by - \ht\@pbox
-  \advance\@tempdimb by - \dp\@pbox
-  \advance\@tempdimb by - 0.5 \@tempdimb
-  \ifdim\@tempdimb < 0em \setlength\@tempdimb{0em}\fi
-  \begin{titlepage}
-    \hbox{
-    \kern\@tempdima
-    \vbox{%
-      \kern\@tempdimb
-      \hrule
-      \hbox{%
-        \vrule\kern1.5pt
-        \vbox{\kern1.5pt\hrule
-          \hbox{\vrule
-            \if@septitle
-              \kern2em
-            \else
-              \pecha@numtitle
-            \fi
-            \vbox{\kern2.5em\hrule
-              \hbox{\vrule\kern1.5pt
-                \vbox{\kern1.5pt\hrule
-                  \hbox{\vrule\kern4em\@doubleruler\kern2em\@doubleruler
-                    \kern1em\box\@pbox\kern1ex
-                 \@doubleruler\kern2em\@doubleruler\kern4em\vrule
-               }
-               \hrule\kern1.5pt}\kern1.5pt\vrule
-             }\hrule\kern2.5em
-           }\kern2.5em\vrule
-         }\hrule\kern1.5pt
-       }\kern1.5pt\vrule
-     }\hrule\vfill
-   }\hfill
-   }
-  \end{titlepage}
+\tl_new:N \g_pecha_title_tl
+\newcommand{\pechatitle}[1]{
+  \tl_gset:Nn \g_pecha_title_tl {#1}
+  \bool_set_true:N \g_pecha_has_title_bool
 }
+\renewcommand{\title}[1]{\pechatitle{#1}}
 
-% print sheet number on title page
-
-\def\pecha@numtitle{
-  \setlength{\@tempdimc}{\textheight}
-  \advance \@tempdimc by - 2\@tempdimb
-  \advance \@tempdimc by - 1em
-  \if@septitle
-  \else
-  \setbox\@obox\hbox{
-    \hbox to \@tempdimc{
-      \scriptsize\tib\@oleft~\hss\tib\tibnumeral{\thepechasheet}\hss\@@oleft
-  }}
-  \ht\@obox=\@marginht
-  \dp\@obox=\@margindp
-  \kern\dp\@obox
-  \begin{turn}{-90}
-     \kern-\@tempdimc\kern-0.8em\box\@obox
-  \end{turn}
-  \fi
-}
-
-\def\pecha@titlepage#1{
-  \box#1
-  \global\@pechatitlefalse
-}
-
-
-% The left "header" on odd pages
-\def\@oddleft{%
-  \setbox\@pbox\hbox{
-      \hbox to \textheight{
-        \scriptsize\tib\@oleft\hss\tib\tibnumeral{\thepechasheet}\hss\@@oleft
-      }}
-  \ht\@pbox=\@marginht
-  \dp\@pbox=\@margindp
-  \begin{turn}{-90}
-    \kern-\textheight\kern-1em\box\@pbox
-  \end{turn}
-}
-
-% the left "header" on even pages
-\def\@evenleft{%
-  \setbox\@pbox\hbox{
-      \hskip-\textheight\kern-1em\hbox to \textheight{
-        \scriptsize\tib\hss\@eleft\hss
-      }
+\newcommand{\tibnumeral}[1]{
+  \int_compare:nNnTF {#1} < {100} {
+    \int_case:nn {#1} {
+      {0} {}
+      {1} {gcig}
+      {2} {gnyis}
+      {3} {gsum}
+      {4} {bzhi}
+      {5} {lnga}
+      {6} {drug}
+      {7} {bdun}
+      {8} {b-rgyad}
+      {9} {dgu}
+      {10} {bcu}
+      {11} {bcu~gcig}
+      {12} {bcu~gnyis}
+      {13} {bcu~gsum}
+      {14} {bcu~bzhi}
+      {15} {bco~lnga}
+      {16} {bcu~drug}
+      {17} {bcu~bdun}
+      {18} {bco~b-rgyad}
+      {19} {bcu~dgu}
+      {20} {nyi~shu}
+      {21} {nyi~shu~tsa~gcig}
+      {22} {nyi~shu~tsa~gnyis}
+      {23} {nyi~shu~tsa~gsum}
+      {24} {nyi~shu~tsa~bzhi}
+      {25} {nyi~shu~tse~lnga}
+      {26} {nyi~shu~tsa~drug}
+      {27} {nyi~shu~tsa~bdun}
+      {28} {nyi~shu~tsa~b-rgyad}
+      {29} {nyi~shu~tsa~dgu}
+      {30} {gsum~bcu}
+      {31} {gsum~bcu~so~gcig}
+      {32} {gsum~bcu~so~gnyis}
+      {33} {gsum~bcu~so~gsum}
+      {34} {gsum~bcu~so~bzhi}
+      {35} {gsum~bcu~so~lnga}
+      {36} {gsum~bcu~so~drug}
+      {37} {gsum~bcu~so~bdun}
+      {38} {gsum~bcu~so~b-rgyad}
+      {39} {gsum~bcu~so~dgu}
+      {40} {bzhi~bcu}
+      {41} {bzhi~bcu~zhe~gcig}
+      {42} {bzhi~bcu~zhe~gnyis}
+      {43} {bzhi~bcu~zhe~gsum}
+      {44} {bzhi~bcu~zhe~bzhi}
+      {45} {bzhi~bcu~zhe~lnga}
+      {46} {bzhi~bcu~zhe~drug}
+      {47} {bzhi~bcu~zhe~bdun}
+      {48} {bzhi~bcu~zhe~b-rgyad}
+      {49} {bzhi~bcu~zhe~dgu}
+      {50} {lnga~bcu}
+      {51} {lnga~bcu~nga~gcig}
+      {52} {lnga~bcu~nga~gnyis}
+      {53} {lnga~bcu~nga~gsum}
+      {54} {lnga~bcu~nga~bzhi}
+      {55} {lnga~bcu~nge~lnga}
+      {56} {lnga~bcu~nga~drug}
+      {57} {lnga~bcu~nga~bdun}
+      {58} {lnga~bcu~nga~b-rgyad}
+      {59} {lnga~bcu~nga~dgu}
+      {60} {drug~bcu}
+      {61} {drug~bcu~re~gcig}
+      {62} {drug~bcu~re~gnyis}
+      {63} {drug~bcu~re~gsum}
+      {64} {drug~bcu~re~bzhi}
+      {65} {drug~bcu~re~lnga}
+      {66} {drug~bcu~re~drug}
+      {67} {drug~bcu~re~bdun}
+      {68} {drug~bcu~re~b-rgyad}
+      {69} {drug~bcu~re~dgu}
+      {70} {bdun~bcu}
+      {71} {bdun~bcu~don~gcig}
+      {72} {bdun~bcu~don~gnyis}
+      {73} {bdun~bcu~don~gsum}
+      {74} {bdun~bcu~don~bzhi}
+      {75} {bdun~bcu~don~lnga}
+      {76} {bdun~bcu~don~drug}
+      {77} {bdun~bcu~don~bdun}
+      {78} {bdun~bcu~don~b-rgyad}
+      {79} {bdun~bcu~don~dgu}
+      {80} {b-rgyad~bcu}
+      {81} {b-rgyad~bcu~rgya~gcig}
+      {82} {b-rgyad~bcu~rgya~gnyis}
+      {83} {b-rgyad~bcu~rgya~gsum}
+      {84} {b-rgyad~bcu~rgya~bzhi}
+      {85} {b-rgyad~bcu~rgya~lnga}
+      {86} {b-rgyad~bcu~rgya~drug}
+      {87} {b-rgyad~bcu~rgya~bdun}
+      {88} {b-rgyad~bcu~rgya~b-rgyad}
+      {89} {b-rgyad~bcu~rgya~dgu}
+      {90} {dgu~bcu}
+      {91} {dgu~bcu~go~gcig}
+      {92} {dgu~bcu~go~gnyis}
+      {93} {dgu~bcu~go~gsum}
+      {94} {dgu~bcu~go~bzhi}
+      {95} {dgu~bcu~go~lnga}
+      {96} {dgu~bcu~go~drug}
+      {97} {dgu~bcu~go~bdun}
+      {98} {dgu~bcu~go~b-rgyad}
+      {99} {dgu~bcu~go~dgu}
     }
-  \ht\@pbox=\@marginht
-  \dp\@pbox=\@margindp
-  \begin{turn}{-90}
-    \box\@pbox
-  \end{turn}
-}
-
-% The right "header" on odd pages
-\def\@oddright{%
-  \setbox\@pbox\hbox{
-    \hbox to \textheight{
-      \footnotesize\hss\kern1em\@oright\hss}}
-  \ht\@pbox=\@marginht
-  \dp\@pbox=\@margindp
-  \begin{turn}{90}
-    \box\@pbox
-  \end{turn}
-}
-
-% The right "header" on even pages
-\def\@evenright{%
-  \setbox\@pbox\hbox{
-    \hbox to \textheight
-      {\footnotesize\hss\kern1em\@eright\hss}}
-  \ht\@pbox=\@marginht
-  \dp\@pbox=\@margindp
-  \begin{turn}{90}
-    \box\@pbox
-  \end{turn}
-}
-
-% The left "header" on odd pages
-\def\@oddfancy{
-  \setbox\@pbox\hbox{
-      \hbox to \textheight{
-        \footnotesize\tib\@oleft\hss\tibnumeral{\thepechasheet}\hss\@@oleft
-      }}
-  \ht\@pbox=\@marginht
-  \dp\@pbox=\@margindp
-  \begin{turn}{-90}
-    \hskip-\textheight\kern-1em\box\@pbox
-  \end{turn}
-}
-
-% the left "header" on even pages
-\def\@evenfancy{
-  \setbox\@pbox\hbox{
-      \hskip-\textheight\kern-1em\hbox to \textheight{
-        \footnotesize\tib\hss\@eleft\hss\
-      }
-    }
-  \ht\@pbox=\@marginht
-  \dp\@pbox=\@margindp
-  \begin{turn}{-90}
-    \box\@pbox
-  \end{turn}
-
-}
-
-
-% section{Die Ausgabefunktionen}
-% Um die Pecha-typischen Textrahmen zu erzeugen, wurde die
-% LaTeX Ausgaberoutine umgeschrieben.
-% Kopf- und Fußzeilen machen bei Pechas keinen Sinn,
-% deshalb werden sie ausgelassen.
-% Dafür übernehmen die linken und rechten Ränder
-% eine ähnliche Funktion.
-%
-% Klassenoptionen:
-% Seiten können derzeit in drei unterschiedlichen
-% Stilen ausgegeben werden:
-% Mit folgenden Klassenoptionen kann die Ausgabe
-% beeinflußt werden:
-% doubleframe
-% Wird von dieser Klasse als Standardrahmen verwendet.
-% Der Textrahmen besteht aus einer Doppellinie.
-% singleframe
-% Entspricht eher dem originalen tibetischen Stil:
-% Der Text wird von einem einfachen Textrahmen umgeben.
-% fancyframe
-% Diese Option kann mit einer der vorangehenden Optionen
-% kombiniert werden. Sie bewirkt, daß die ersten drei
-% Seiten von einem besonderen Rahmen umgeben werden. 
-% Die restlichen Seiten werden mit doppeltem oder 
-% einfachen Rahmen ausgegeben.
-%
-% Die Seiten werden mit Hilfe des geometry-Pakets korrekt
-% auf die Mitte des Blattes positioniert.
-% Auch der linke Offset für die Buchbindung
-% muß wieder abgezogen werden, damit die Seiten
-% auf Vor- und Rückseite gleich positioniert werden.
-%
-% Das Paket "rotating" wird benutzt, um die
-% Randzeilen hochkant darzustellen.
-% Außerdem ermöglicht die Klassenoption "rotate" es,
-% jede gerade Seite um 180 Grad gedreht darzustellen,
-% was beim Ausdruck auf Duplexdruckern hilfreich sein kann.
-
-% |@doubleframe|
-% Dieses Makro erzeugt einen pechatypischen Doppelrahmen
-% um die Textbox in Argument #1
-\def\@doubleframe#1{
-  \hbox{\vrule %left outer line
-    \vbox{\hrule\kern1.5pt % top outer line
-      \hbox{\kern1.5pt\vrule % left inner line
-        \vbox{\hrule % top inner line
-          \hbox{
-          \vbox{
-            \hbox{
-              \@theleft % left box content
-              \@doubleruler\kern0.5em % left box inner margin
-              \vbox{
-                \kern1.5ex
-                \box#1
-                \kern1.5ex
-              }
-              %\kern0.5em 
-              \@doubleruler % right box inner margin
-              \@theright}
-            } % right box content
-          }\hrule % right inner line
-        }\vrule\kern1.5pt % lower inner line
-      }\kern1.5pt\hrule % right outer line
-    }\vrule % lower outer line
+  }{
+    #1
   }
 }
 
-% |@singleframe|
-% Dieses Makro erzeugt einen pechatypischen einfachen Rahmen
-% um die Textbox in Argument #1
+\newcommand{\tibsmall}[1]{
+  \bool_if:NTF \g_pecha_unicode_bool {
+    {\footnotesize #1}
+  }{
+    {\footnotesize \tib #1\bit}
+  }
+}
 
-\def\@singleframe#1{
-  \hbox{\vrule
+\cs_new:Npn \pecha_doubleruler: { \vrule \kern 1.5pt \vrule }
+
+\newcommand{\newsheet}{\clearpage\ifodd\c@page\else\hbox{}\newpage\fi}
+
+\newcommand{\pechaglossreset}{
+  \prop_gclear:N \g_pecha_seen_prop
+}
+
+\newcommand{\pechaglossresetall}{
+  \prop_gclear:N \g_pecha_seen_prop
+  \prop_gclear:N \g_pecha_gloss_prop
+  \seq_gclear:N \g_pecha_gloss_order_seq
+}
+
+\newenvironment{pechatitlepage}{%
+  \newsheet
+  \setcounter{page}{1}
+}{%
+  \bool_if:NTF \g_pecha_septitle_bool {
+    \newsheet
+    \setcounter{page}{1}
+    \setcounter{pechasheet}{1}
+  }{
+    \newpage
+  }
+}
+
+\let\titlepage\pechatitlepage
+
+\dim_new:N \l_tmpc_dim
+
+\newcommand{\makepechatitle}{
+  \bool_set_true:N \g_pecha_has_title_bool
+  \hbox_set:Nn \l_tmpa_box { \parbox{\g_pecha_titlewidth_dim}{
+    \centering { \pechatibfont \g_pecha_title_tl } \par
+  }}
+  \dim_set:Nn \l_tmpa_dim { \textwidth - 12pt - 10em - \box_wd:N \l_tmpa_box }
+  \dim_set:Nn \l_tmpa_dim { 0.5\l_tmpa_dim }
+  \dim_compare:nNnT {\l_tmpa_dim} < {0em} { \dim_set:Nn \l_tmpa_dim {0em} }
+  \dim_set:Nn \l_tmpb_dim { \textheight - 4pt - 5em - \box_ht:N \l_tmpa_box - \box_dp:N \l_tmpa_box }
+  \dim_set:Nn \l_tmpb_dim { 0.5\l_tmpb_dim }
+  \dim_compare:nNnT {\l_tmpb_dim} < {0em} { \dim_set:Nn \l_tmpb_dim {0em} }
+  \begin{pechatitlepage}
+    \hbox{
+      \kern \l_tmpa_dim
+      \vbox{
+        \kern \l_tmpb_dim
+        \hrule
+        \hbox{
+          \vrule\kern 1.5pt
+          \vbox{\kern 1.5pt\hrule
+            \hbox{\vrule
+              \bool_if:NT \g_pecha_septitle_bool {
+                \kern 2em
+              }
+              \bool_if:NF \g_pecha_septitle_bool {
+                \pecha_title_numlabel:
+              }
+              \vbox{\kern 2.5em\hrule
+                \hbox{\vrule\kern 1.5pt
+                  \vbox{\kern 1.5pt\hrule
+                    \hbox{\vrule\kern 4em
+                      \pecha_doubleruler:\kern 2em\pecha_doubleruler:
+                      \kern 1em\box_use:N \l_tmpa_box\kern 1ex
+                      \pecha_doubleruler:\kern 2em\pecha_doubleruler:\kern 4em\vrule
+                    }
+                    \hrule\kern 1.5pt
+                  }\kern 1.5pt\vrule
+                }\hrule\kern 2.5em
+              }\kern 2.5em\vrule
+            }\hrule\kern 1.5pt
+          }\kern 1.5pt\vrule
+        }\hrule\vfill
+      }\hfill
+    }
+  \end{pechatitlepage}
+}
+\let\maketitle\makepechatitle
+
+\cs_new:Npn \pecha_title_numlabel: {
+  \dim_set:Nn \l_tmpc_dim { \textheight - 2\l_tmpb_dim - 1em }
+  \hbox_set:Nn \l_tmpa_box {
+    \hbox_to_wd:nn { \l_tmpc_dim } {
+      \scriptsize\pechatibfont
+      \bool_if:NTF \g_pecha_unicode_bool {
+        \g_pecha_oleft_tl \hfil \tibnumeral{\thepechasheet} \hfil \g_pecha_oleft_alt_tl
+      }{
+        \tib \g_pecha_oleft_tl \hfil \tibnumeral{\thepechasheet} \hfil \g_pecha_oleft_alt_tl \bit
+      }
+    }
+  }
+  \box_set_ht:Nn \l_tmpa_box { \g_pecha_marginht_dim }
+  \box_set_dp:Nn \l_tmpa_box { \g_pecha_margindp_dim }
+  \kern \box_dp:N \l_tmpa_box
+  \rotatebox{-90}{\kern -\l_tmpc_dim \kern -0.8em \box_use:N \l_tmpa_box}
+}
+
+\cs_new:Npn \pecha_oddleft: {
+  \hbox_set:Nn \l_tmpa_box {
+    \hbox_to_wd:nn { \textheight } {
+      \scriptsize\pechatibfont
+      \bool_if:NTF \g_pecha_unicode_bool {
+        \g_pecha_oleft_tl \hfil \tibnumeral{\thepechasheet} \hfil \g_pecha_oleft_alt_tl
+      }{
+        \tib \g_pecha_oleft_tl \hfil \tibnumeral{\thepechasheet} \hfil \g_pecha_oleft_alt_tl \bit
+      }
+    }
+  }
+  \box_set_ht:Nn \l_tmpa_box { \g_pecha_marginht_dim }
+  \box_set_dp:Nn \l_tmpa_box { \g_pecha_margindp_dim }
+  \rotatebox{-90}{\kern -\textheight \kern -1em \box_use:N \l_tmpa_box}
+}
+
+\cs_new:Npn \pecha_evenleft: {
+  \hbox_set:Nn \l_tmpa_box {
+    \skip_horizontal:n { -\textheight }
+    \kern -1em
+    \hbox_to_wd:nn { \textheight } {
+      \scriptsize\pechatibfont
+      \bool_if:NTF \g_pecha_unicode_bool {
+        \hfil \g_pecha_eleft_tl \hfil
+      }{
+        \tib \hfil \g_pecha_eleft_tl \hfil \bit
+      }
+    }
+  }
+  \box_set_ht:Nn \l_tmpa_box { \g_pecha_marginht_dim }
+  \box_set_dp:Nn \l_tmpa_box { \g_pecha_margindp_dim }
+  \rotatebox{-90}{\box_use:N \l_tmpa_box}
+}
+
+\cs_new:Npn \pecha_oddright: {
+  \hbox_set:Nn \l_tmpa_box {
+    \hbox_to_wd:nn { \textheight } {
+      \footnotesize \hfil \kern 1em \g_pecha_oright_tl \hfil
+    }
+  }
+  \box_set_ht:Nn \l_tmpa_box { \g_pecha_marginht_dim }
+  \box_set_dp:Nn \l_tmpa_box { \g_pecha_margindp_dim }
+  \rotatebox{90}{\box_use:N \l_tmpa_box}
+}
+
+\cs_new:Npn \pecha_evenright: {
+  \hbox_set:Nn \l_tmpa_box {
+    \hbox_to_wd:nn { \textheight } {
+      \footnotesize \hfil \kern 1em \g_pecha_eright_tl \hfil
+    }
+  }
+  \box_set_ht:Nn \l_tmpa_box { \g_pecha_marginht_dim }
+  \box_set_dp:Nn \l_tmpa_box { \g_pecha_margindp_dim }
+  \rotatebox{90}{\box_use:N \l_tmpa_box}
+}
+
+\cs_new:Npn \pecha_oddfancy: {
+  \hbox_set:Nn \l_tmpa_box {
+    \hbox_to_wd:nn { \textheight } {
+      \footnotesize\pechatibfont
+      \bool_if:NTF \g_pecha_unicode_bool {
+        \g_pecha_oleft_tl \hfil \tibnumeral{\thepechasheet} \hfil \g_pecha_oleft_alt_tl
+      }{
+        \tib \g_pecha_oleft_tl \hfil \tibnumeral{\thepechasheet} \hfil \g_pecha_oleft_alt_tl \bit
+      }
+    }
+  }
+  \box_set_ht:Nn \l_tmpa_box { \g_pecha_marginht_dim }
+  \box_set_dp:Nn \l_tmpa_box { \g_pecha_margindp_dim }
+  \rotatebox{-90}{\skip_horizontal:n { -\textheight } \kern -1em \box_use:N \l_tmpa_box}
+}
+
+\cs_new:Npn \pecha_evenfancy: {
+  \hbox_set:Nn \l_tmpa_box {
+    \skip_horizontal:n { -\textheight }
+    \kern -1em
+    \hbox_to_wd:nn { \textheight } {
+      \footnotesize\pechatibfont
+      \bool_if:NTF \g_pecha_unicode_bool {
+        \hfil \g_pecha_eleft_tl \hfil
+      }{
+        \tib \hfil \g_pecha_eleft_tl \hfil \bit
+      }
+    }
+  }
+  \box_set_ht:Nn \l_tmpa_box { \g_pecha_marginht_dim }
+  \box_set_dp:Nn \l_tmpa_box { \g_pecha_margindp_dim }
+  \rotatebox{-90}{\box_use:N \l_tmpa_box}
+}
+
+\cs_new:Npn \pecha_doubleframe:n #1 {
+  \hbox{
+    \vrule
+    \vbox{\hrule\kern 1.5pt
+      \hbox{\kern 1.5pt\vrule
         \vbox{\hrule
           \hbox{
-          \vbox{
-            \hbox{
-            \@theleft
-            \vrule\kern0.5em
             \vbox{
-              \kern1.5ex
-              \box#1
-              \kern1.5ex
-            }
-            %\kern0.5em
-            \vrule
-            \@theright}}
-          }\hrule
-        }\vrule
-  }
-}
-
-% |@fancyframe|
-% Dieses Makro erzeugt einen pechatypischen Rahmen
-% um die Textbox in Argument #1.
-% Hier wird auf den ersten ein besonderer Rahmen erstellt,
-% alle folgenden Seiten werden je nach Option (simple,fancy oder
-% standard,fancy) in einem einfachen oder einem doppelten Rahmen
-% ausgegeben.
-\def\@fancyframe#1{
-%  \ifnum\thepage > 2
-%    \global\@ffancyfalse
-%    \if@fsingle
-%      \global\def\@pageframe{\@singleframe#1}
-%    \else
-%      \global\def\@pageframe{\@doubleframe#1}
-%    \fi
-%    \global\addtolength\textwidth{-12em}
-%    \global\addtolength\linewidth{-12em}
-%  \fi
-  \hbox{\vrule
-    \vbox{\hrule\kern1.5pt
-      \hbox{\kern1.5pt\vrule
-        \vbox{\hrule\kern2em
-          \hbox{
-            \ifodd\c@page
-              \@oddfancy
-            \else
-              \@evenfancy
-            \fi
-            \vrule
-            \vbox{\hrule\kern1.5pt
-              \hbox{\kern1.5pt
-                \vrule
+              \hbox{
+                \l_pecha_theleft_tl
+                \pecha_doubleruler:\kern 0.5em
                 \vbox{
-                  \hrule
-                  \hbox{
-                    \kern4em\@doubleruler\kern2em\@doubleruler\kern0.5em
-                    \vbox{
-		    %\kern0.5em
-                    \box#1}
-                    \@doubleruler\kern2em\@doubleruler\kern4em
-                  }
-                  \hrule
-                }\vrule\kern1.5pt
-              }\kern1.5pt\hrule
-            }\vrule\kern2em
-          }\kern2em\hrule
-        }\vrule\kern1.5pt
-      }\kern1.5pt\hrule
+                  \kern 1.5ex
+                  \box_use:N #1
+                  \kern 1.5ex
+                }
+                \pecha_doubleruler:
+                \l_pecha_theright_tl
+              }
+            }
+          }\hrule
+        }\vrule\kern 1.5pt
+      }\kern 1.5pt\hrule
     }\vrule
   }
 }
 
+\cs_new:Npn \pecha_singleframe:n #1 {
+  \hbox{
+    \vrule
+    \vbox{\hrule
+      \hbox{
+        \vbox{
+          \hbox{
+            \l_pecha_theleft_tl
+            \vrule\kern 0.5em
+            \vbox{
+              \kern 1.5ex
+              \box_use:N #1
+              \kern 1.5ex
+            }
+            \vrule
+            \l_pecha_theright_tl
+          }
+        }
+      }\hrule
+    }\vrule
+  }
+}
 
-% |pecha@outputpage|
-% Das ist die neu geschriebene Ausgaberoutine
-% Derzeit kann sie folgendes:
-% Ausgabe einer Titelseite (muß beim Pecha von hier aus geschehen)
-% Ausgabe einer einfachen Textseite mit beliebigem Inhalt im
-% Pecha-Doppelrahmen
-% Ausgabe der linken Randzeilen im Pecha-Stil
-% Ausgabe von rechten Randzeilen, voreingestellt
-% auf die Seitennummer. Man kann geradseitige und
-% ungeradseitige rechte können mit den Makros
-% |\oddright| und |\evenright| unabhängig von einander
-% eingestellt werden.
+\cs_new:Npn \pecha_fancyframe:n #1 {
+  \hbox{
+    \vrule
+    \vbox{\hrule\kern 1.5pt
+      \hbox{\kern 1.5pt\vrule
+        \vbox{\hrule\kern 2em
+          \hbox{
+            \int_if_odd:nTF {\c@page} {
+              \pecha_oddfancy:
+            }{
+              \pecha_evenfancy:
+            }
+            \vrule
+            \vbox{\hrule\kern 1.5pt
+              \hbox{\kern 1.5pt
+                \vrule
+                \vbox{
+                  \hrule
+                  \hbox{
+                    \kern 4em\pecha_doubleruler:\kern 2em\pecha_doubleruler:\kern 0.5em
+                    \vbox{\box_use:N #1}
+                    \pecha_doubleruler:\kern 2em\pecha_doubleruler:\kern 4em
+                  }
+                  \hrule
+                }\vrule\kern 1.5pt
+              }\kern 1.5pt\hrule
+            }\vrule\kern 2em
+          }\kern 2em\hrule
+        }\vrule\kern 1.5pt
+      }\kern 1.5pt\hrule
+    }\vrule
+  }
+}
 
-\def\@outputpage{\pecha@outputpage}
+\def\@outputpage{\pecha_outputpage:}
 
-\def\pecha@outputpage{%
-  \begingroup
+\tl_new:N \l_pecha_theleft_tl
+\tl_new:N \l_pecha_theright_tl
+
+\cs_new:Npn \pecha_outputpage: {
+  \group_begin:
     \let\protect\noexpand
-    \set@typeset@protect % otherwise fonts cannot be changed here
+    \set@typeset@protect
     \reset@font
     \normalsize
     \normalsfcodes
     \@parboxrestore
-    % a hack for empty pages: These need to be framed properly
-    \ifodd\count\z@ 
-         \let\@themargin\oddsidemargin
-    \else 
-         \let\@themargin\evensidemargin
-      \fi
+    \int_if_odd:nTF {\count\z@} {
+      \let\@themargin\oddsidemargin
+    }{
+      \let\@themargin\evensidemargin
+    }
     \setbox\@outputbox\vbox{\hfil\box\@outputbox\hfil}
-    \if@pechatitle
-      \setbox\@outputbox\hbox{\pecha@titlepage{\@outputbox}}
-    \else
-      \ifodd\c@page
-        \let\@theleft\@oddleft
-        \let\@theright\@oddright
-        \setbox\@outputbox\hbox{\@pageframe{\@outputbox}}
-      \else
-        \let\@theleft\@evenleft
-        \let\@theright\@evenright
-        \if@pecharotate
-          \setbox\@outputbox\hbox{%
-          %\hskip3pt %I don't know why I do need this!
-          \begin{turn}{180}
-            \@pageframe{\@outputbox}
-          \end{turn}
+    \bool_if:NTF \g_pecha_has_title_bool {
+      \setbox\@outputbox\hbox{\pecha_titlepage_output:n {\@outputbox}}
+    }{
+      \int_if_odd:nTF {\c@page} {
+        \tl_set:Nn \l_pecha_theleft_tl { \pecha_oddleft: }
+        \tl_set:Nn \l_pecha_theright_tl { \pecha_oddright: }
+        \bool_if:NTF \g_pecha_fancyframe_bool {
+          \setbox\@outputbox\hbox{\pecha_fancyframe:n {\@outputbox}}
+        }{
+          \bool_if:NTF \g_pecha_singleframe_bool {
+            \setbox\@outputbox\hbox{\pecha_singleframe:n {\@outputbox}}
+          }{
+            \setbox\@outputbox\hbox{\pecha_doubleframe:n {\@outputbox}}
           }
-        \else
-          \setbox\@outputbox\hbox{\@pageframe{\@outputbox}}
-        \fi
+        }
+      }{
+        \tl_set:Nn \l_pecha_theleft_tl { \pecha_evenleft: }
+        \tl_set:Nn \l_pecha_theright_tl { \pecha_evenright: }
+        \bool_if:NTF \g_pecha_rotate_bool {
+          \setbox\@outputbox\hbox{
+            \rotatebox{180}{
+              \bool_if:NTF \g_pecha_fancyframe_bool {
+                \pecha_fancyframe:n {\@outputbox}
+              }{
+                \bool_if:NTF \g_pecha_singleframe_bool {
+                  \pecha_singleframe:n {\@outputbox}
+                }{
+                  \pecha_doubleframe:n {\@outputbox}
+                }
+              }
+            }
+          }
+        }{
+          \bool_if:NTF \g_pecha_fancyframe_bool {
+            \setbox\@outputbox\hbox{\pecha_fancyframe:n {\@outputbox}}
+          }{
+            \bool_if:NTF \g_pecha_singleframe_bool {
+              \setbox\@outputbox\hbox{\pecha_singleframe:n {\@outputbox}}
+            }{
+              \setbox\@outputbox\hbox{\pecha_doubleframe:n {\@outputbox}}
+            }
+          }
+        }
         \stepcounter{pechasheet}
-      \fi
-    \fi
-    \shipout\vbox{%
-    \let\label\@gobble
-    \let\index\@gobble
-    \let\glossary\@gobble
-    \baselineskip \footskip
-    \@begindvi
-    \vskip \topmargin 
-    \moveright\@themargin
-    \box\@outputbox
+      }
+    }
+    \shipout\vbox{
+      \let\label\@gobble
+      \let\index\@gobble
+      \let\glossary\@gobble
+      \baselineskip\footskip
+      \@begindvi
+      \vskip\topmargin
+      \moveright\@themargin
+      \box\@outputbox
+    }
+    \set@typeset@protect
+  \group_end:
+  \stepcounter{page}
+}
+
+\cs_new:Npn \pecha_titlepage_output:n #1 {
+  \box_use:N #1
+  \bool_set_false:N \g_pecha_has_title_bool
+}
+
+\newcommand{\pechaglosssize}{\fontsize{6pt}{7pt}\selectfont}
+\newcommand{\pechaglosscolor}{\color{gray}}
+\newcommand{\pechaglossfont}{\normalfont\pechaglosssize}
+
+\prop_new:N \g_pecha_gloss_prop
+\prop_new:N \g_pecha_seen_prop
+\seq_new:N \g_pecha_gloss_order_seq
+
+\cs_new_protected:Npn \pecha_gloss_render:nn #1#2 {
+  \prop_if_in:NnTF \g_pecha_seen_prop {#1} {
+    { \pechatibfont #1 }
+    \skip_horizontal:n { 0.3em plus 0.1em minus 0.05em }
+    \tex_penalty:D 0
+  }{
+    \prop_gput:Nnn \g_pecha_seen_prop {#1} {1}
+    \prop_gput:Nnn \g_pecha_gloss_prop {#1} {#2}
+    \seq_gput_right:Nn \g_pecha_gloss_order_seq { {#1}{#2} }
+    \group_begin:
+      \begin{tabular}[t]{@{}c@{}}
+        \pechaglossfont \pechaglosscolor #2 \\[0.5pt]
+        { \pechatibfont #1 }
+      \end{tabular}
+    \group_end:
+    \skip_horizontal:n { 0.3em plus 0.1em minus 0.05em }
+    \tex_penalty:D 0
   }
-  \set@typeset@protect
-  \endgroup
-  \stepcounter{page}%
+}
+
+\cs_new_protected:Npn \pecha_gloss_silent:nn #1#2 {
+  \prop_gput:Nnn \g_pecha_gloss_prop {#1} {#2}
+  \seq_if_in:NnF \g_pecha_gloss_order_seq { {#1}{#2} } {
+    \seq_gput_right:Nn \g_pecha_gloss_order_seq { {#1}{#2} }
+  }
+}
+
+\NewDocumentCommand{\pg}{s m m}{
+  \IfBooleanTF{#1} {
+    \pecha_gloss_silent:nn {#2}{#3}
+  } {
+    \pecha_gloss_render:nn {#2}{#3}
+  }
+}
+
+\NewDocumentCommand{\pechagloss}{s m m}{
+  \IfBooleanTF{#1} {
+    \pecha_gloss_silent:nn {#2}{#3}
+  } {
+    \pecha_gloss_render:nn {#2}{#3}
+  }
+}
+
+\newcommand{\pechatrans}[1]{%
+  \par\vskip 4pt
+  \bgroup
+    \small\itshape
+    \setlength{\leftskip}{1.5em}
+    #1%
+  \egroup
+  \par\vskip 8pt
+}
+
+\newenvironment{pechablock}{
+  \par\vskip 4pt
+  \sloppy
+}{
+  \par\vskip 4pt
+}
+
+\newcommand{\pechatext}[1]{%
+  \par
+  \raggedright
+  \sloppy
+  \parindent=0pt
+  { \pechatibfont #1 }%
+  \par
+}
+
+\newcommand{\pecha}[1]{\pechatext{#1}}
+
+\newlength{\pechaglossarycolsep}
+\setlength{\pechaglossarycolsep}{2em}
+
+\cs_new_protected:Npn \pecha_print_glossary_entry:nn #1#2 {
+  \hbox{
+    \hbox_to_wd:nn { 0.28\textwidth } { \raggedleft { \pechatibfont #1 } \hfil }
+    \hbox_to_wd:nn { \pechaglossarycolsep } { \hfil }
+    \hbox_to_wd:nn { 0.44\textwidth } { #2 \hfil }
+  }
+  \par\vskip 2pt
+}
+
+\NewDocumentCommand{\printpechaglossary}{o}{
+  \newsheet
+  \bool_if:NTF \g_pecha_fancyframe_bool {
+    \bool_set_false:N \g_pecha_fancyframe_bool
+    \bool_set_false:N \g_pecha_singleframe_bool
+  }{}
+  \par
+  \vskip 12pt
+  \group_begin:
+    \centering
+    \textbf{\Large \pecha_glossary_title:}\par\vskip 12pt
+  \group_end:
+  \seq_if_empty:NTF \g_pecha_gloss_order_seq {
+    \noindent \textit{No~glossary~entries~defined.}
+  }{
+    \seq_map_inline:Nn \g_pecha_gloss_order_seq {
+      \pecha_print_glossary_entry:nn ##1
+    }
+  }
+  \par
+}
+
+\newcommand{\pechaglossarytitle}[1]{
+  \tl_gset:Nn \g_pecha_glossary_title_tl {#1}
+}
+\tl_new:N \g_pecha_glossary_title_tl
+\tl_gset:Nn \g_pecha_glossary_title_tl {Glossary}
+
+\cs_new:Npn \pecha_glossary_title: {
+  \tl_use:N \g_pecha_glossary_title_tl
+}
+
+\newcommand{\setpechafont}[1]{
+  \bool_if:NTF \g_pecha_unicode_bool {
+    \RenewDocumentCommand{\pechatibfont}{}{\fontspec[Script=Tibetan]{#1}}
+  }{
+    \ClassWarning{pecha}{setpechafont~has~no~effect~in~wylie~mode}
+  }
+}
+
+\newcommand{\settranslationfont}[1]{
+  \bool_if:NTF \g_pecha_unicode_bool {
+    \newfontface\pechatranslationfont{#1}
+  }{
+    \ClassWarning{pecha}{settranslationfont~has~no~effect~in~wylie~mode}
+  }
+}
+
+\bool_if:NT \g_pecha_unicode_bool {
+  \newfontfamily\pechatibfont[Script=Tibetan]{Noto~Serif~Tibetan}
+  \providecommand{\pechatranslationfont}{\normalfont}
+}
+
+\AtBeginDocument{
+  \bool_if:NT \g_pecha_unicode_bool {
+    \@ifundefined{pechatibfont}{
+      \ClassWarning{pecha}{No~Tibetan~font~set.~Use~\string\setpechafont\space to~set~one.}
+    }{}
+  }
 }
 
 \endinput
-

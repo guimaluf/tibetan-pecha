@@ -1,41 +1,105 @@
-### Sadhanas
+# pecha — Tibetan Pecha Document Class for Translation Studies
 
-* [Dudjom Tersar Ngöndro](dudjom-tersar-ngondro/)
-* [Prajna Paramita](prajnaparamita/)
-* [Chuva de bençãos](tsigdun-soldeb-naldjor)
-* []
+A LaTeX document class for creating traditional Tibetan pechas
+(དཔེ་ཆ) with interlinear glossing, translation, and glossary
+generation. Designed for A4 landscape printing with classic
+pecha formatting.
 
-### Requirements
+## Features
 
-[CTAN Tibetan Language](http://ctan.mackichan.com/language/tibetan/)
----
-* ctib
-* pecha
+- Traditional Tibetan pecha layout (landscape, framed pages,
+  sheet numbering, margin texts)
+- Word-by-word glosses above Tibetan text using `\pg{word}{gloss}`
+- Glosses appear only on first occurrence (de-clutters the pecha)
+- Free-form translation paragraphs below Tibetan text
+- Automatic glossary generation at document end
+- Unicode Tibetan support via XeLaTeX/LuaLaTeX (recommended)
+- Wylie transliteration support via the legacy `ctib` package
 
-These packages can be found in `texlive-lang-others` and `texlive-latex-extra`
-on Ubuntu, which can be installed as the following:
+## Requirements
 
-`sudo apt-get install texlive-lang-others texlive-latex-extra`
+- **XeLaTeX** or **LuaLaTeX** (recommended for Unicode Tibetan)
+- A Tibetan Unicode font (e.g. Noto Serif Tibetan, Jomolhari)
+- `texlive-latex-recommended` and `texlive-latex-extra` (Ubuntu)
+- For Wylie mode: `texlive-lang-other` (provides the `ctib` package)
 
-Compiling is done using XeLaTeX, which can be obtained with:
+Install on Ubuntu:
 
-`sudo apt-get install texlive-xetex `
+    sudo apt-get install texlive-xetex texlive-latex-extra
+    sudo apt-get install fonts-noto  # for Noto Serif Tibetan
 
-Example of usage:
+## Quick Start
 
-Using xelatex
+```latex
+\documentclass{pecha}
+\setpechafont{Noto Serif Tibetan}
 
-`xelatex prajnaparamita.tex`
+\title{Example Pecha}
+\oddleft{T}{E}
 
-Using latexmk
+\begin{document}
+\maketitle
 
-`latexmk -pdf -pv -xelatex tsigdun-soldeb-naldjor.tex`
+\pecha{
+  \pg{དཔེ་ཆ}{pecha} \pg{ནི}{is} \pg{བོད་ཀྱི}{Tibetan}
+}
+\pechatrans{The pecha is the traditional Tibetan book format.}
 
+\printpechaglossary
+\end{document}
+```
 
-Merging `a4pecha2` into one single printable pdf using `pdfjam`
+## Compilation
 
-`pdfjam tsigdun-soldeb-naldjor/tsigdun-soldeb-naldjor.pdf --nup 1x2 --landscape --outfile tsigdun-soldeb-naldjor-merged.pdf`
+    xelatex pecha-example.tex
+
+## Key Commands
+
+| Command | Description |
+|---------|-------------|
+| `\pg{word}{gloss}` | Gloss a Tibetan word (shown only on first occurrence) |
+| `\pg*{word}{gloss}` | Silent gloss: glossary only, no in-text display |
+| `\pecha{...}` | Tibetan text paragraph |
+| `\pechatrans{...}` | Translation paragraph |
+| `\printpechaglossary` | Print glossary at end of document |
+| `\pechaglossreset` | Reset gloss tracking (new chapter/section) |
+| `\pechaglossresetall` | Reset all gloss tracking and glossary entries |
+| `\setpechafont{font}` | Set the Tibetan font |
+| `\settranslationfont{font}` | Set a dedicated font for translations |
+| `\oddleft{a}{b}` | Left margin text on odd pages |
+| `\oddright{text}` | Right margin text on odd pages |
+| `\evenleft{text}` | Left margin text on even pages |
+| `\evenright{text}` | Right margin text on even pages |
+
+## Class Options
+
+| Option | Description |
+|--------|-------------|
+| `a4pecha2` | A4 landscape, 140mm height (default) |
+| `a4pecha3` | A4 landscape, 70mm height |
+| `letterpecha2` | Letter landscape, 2 pechas per page |
+| `doubleframe` | Double-line border (default) |
+| `simpleframe` | Single-line border |
+| `fancyframe` | Ornamented frame on first pages |
+| `rotate` | Rotate even pages 180° |
+| `narrowpage` | Narrower text block |
+| `mediumpage` | Medium text block (default) |
+| `widepage` | Wider text block |
+| `extrawide` | Maximum text width |
+| `septitle` | Separate title page |
+| `wylie` | Use ctib/Wylie input mode |
+
+## Merging Pages for Printing
+
+Use `pdfjam` to merge pecha pages for A4 printing:
+
+    pdfjam pecha-example.pdf --nup 1x2 --landscape \
+      --outfile pecha-example-merged.pdf
 
 ## License
 
-The content of this project itself is licensed under the [Creative Commons Attribution 4.0 license](https://creativecommons.org/licenses/by/4.0/), and the underlying source code used to format and display that content is licensed under the [MIT license](http://opensource.org/licenses/mit-license.php).
+Code: MIT License — see [LICENSE](LICENSE)
+Content: Creative Commons Attribution 4.0
+
+This package builds upon the original `pecha.cls` by Dieter Jäger
+(2004, GPL) and the `ctib` package by Oliver Corff (2002).
