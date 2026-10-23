@@ -797,23 +797,15 @@
   \par\vskip 8pt
 }
 
-\newenvironment{pechablock}{
-  \par\vskip 4pt
-  \sloppy
-}{
-  \par\vskip 4pt
-}
-
-\newcommand{\pechatext}[1]{%
-  \par
-  \raggedright
-  \sloppy
-  \parindent=0pt
-  { \pechatibfont \pechatextsize #1 }%
+\NewDocumentEnvironment{pecha}{}{%
+  \par \raggedright \sloppy \parindent=0pt
+  \hfuzz=0.5em
+  \pechatibfont \pechatextsize
+}{%
   \par
 }
 
-\newcommand{\pecha}[1]{\pechatext{#1}}
+\newcommand{\pechatext}[1]{\begin{pecha}#1\end{pecha}}
 
 \newlength{\pechaglossarycolsep}
 \setlength{\pechaglossarycolsep}{2em}
@@ -893,6 +885,8 @@
 
 \AtBeginDocument{
   \bool_if:NT \g_pecha_unicode_bool {
+    \XeTeXlinebreaklocale "bo"
+    \XeTeXlinebreakskip 0pt plus 0.1pt minus 0.05pt
     \@ifundefined{pechatibfont}{
       \ClassWarning{pecha}{No~Tibetan~font~set.~Use~\string\setpechafont\space to~set~one.}
     }{}
